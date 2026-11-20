@@ -31,8 +31,9 @@ Castellano neutro (tú); Rafael no es programador: pasos exactos.
 
 ## Estado (20-nov-2026)
 - [x] v1.0 publicada en modo de prueba; pruebas backend y e2e OK.
-- [x] Script pegado e implementado (20-nov): implementación `AKfycbyWnkZy…xnfA`, incrustada en `URL_SCRIPT`. Enlace vigente `?v=2`. Prueba real OK (RP-F6XVDT7Z, docente «PRUEBA Claude»).
-- [ ] Rafael: menú Rúbrica → Borrar registros de prueba antes de difundir.
+- [x] Script pegado e implementado (20-nov): implementación `AKfycbyWnkZy…xnfA`, incrustada en `URL_SCRIPT`. (entonces `?v=2`). Prueba real OK (RP-F6XVDT7Z, docente «PRUEBA Claude»).
+- [x] v2.0 (20-nov, a pedido de Rafael): **hoja única** «como la rúbrica impresa»: arriba pestañas de hito + docente/materia/paralelo/grupo; dimensiones por grupo en columnas (criterios con niveles para tocar, nota parcial); abajo tabla de estudiantes (nombre + nota por estudiante + nota final, pegar lista reparte filas, Enter avanza); botón único «Enviar todo» con resumen. Diseño oscuro con degradado por dimensión (Rafael: no hace falta copiar los colores del Excel). Borrador automático en `rubp1_ev`. Enlace vigente `?v=3`. Prueba real OK (RP-K20K35F9).
+- [ ] Rafael: menú Rúbrica → Borrar registros de prueba antes de difundir (hay 2 grupos «PRUEBA Claude…»).
 - Para probar sin escribir en la hoja: `?api=prueba`.
 
 ## Comandos
