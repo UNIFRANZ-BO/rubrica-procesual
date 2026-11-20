@@ -1,0 +1,5 @@
+tests/capturas/
+tests/.check_*
+docs/
+apps-script/.clasp.json
+__pycache__/
