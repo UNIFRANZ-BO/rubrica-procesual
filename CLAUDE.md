@@ -34,7 +34,7 @@ Castellano neutro (tú); Rafael no es programador: pasos exactos.
 - [x] Script pegado e implementado (20-nov): implementación `AKfycbyWnkZy…xnfA`, incrustada en `URL_SCRIPT`. (entonces `?v=2`). Prueba real OK (RP-F6XVDT7Z, docente «PRUEBA Claude»).
 - [x] v2.0 (20-nov, a pedido de Rafael): **hoja única** «como la rúbrica impresa»: arriba pestañas de hito + docente/materia/paralelo/grupo; dimensiones por grupo en columnas (criterios con niveles para tocar, nota parcial); abajo tabla de estudiantes (nombre + nota por estudiante + nota final, pegar lista reparte filas, Enter avanza); botón único «Enviar todo» con resumen. Diseño oscuro con degradado por dimensión (Rafael: no hace falta copiar los colores del Excel). Borrador automático en `rubp1_ev`. Enlace vigente `?v=3`. Prueba real OK (RP-K20K35F9).
 - [x] v2.3 (20-nov): selector «Hito a evaluar» (cada hito es una evaluación aparte; con un solo hito habilitado en CONFIG no aparece); hitos sin semana («Hito 2»…«Hito 5»); sin Materia; **Semestre** (lista de CONFIG «Semestres», por defecto 1–10) y **Paralelo** (lista de CONFIG «Paralelos»; vacía = se escribe). Columna D de REGISTROS/PAPELERA y E de DETALLE renombradas «Semestre» (la app manda `semestre` y también `materia` = semestre para que el script 1.0 siga funcionando). Script RP 1.1 (devuelve semestres/paralelos). Enlace `?v=4`.
-- [ ] Rafael: pegar Code.gs RP 1.1 → Administrar implementaciones → ✏️ → Nueva versión.
+- [x] Script RP 1.1 implementado como Nueva versión (20-nov), misma URL. Paralelo queda abierto (CONFIG Paralelos vacío, decisión de Rafael).
 - [ ] Rafael: menú Rúbrica → Borrar registros de prueba antes de difundir (hay 2 grupos «PRUEBA Claude…»).
 - Para probar sin escribir en la hoja: `?api=prueba`.
 
