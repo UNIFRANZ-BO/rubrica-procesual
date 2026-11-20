@@ -10,13 +10,13 @@
  *
  * @OnlyCurrentDoc
  */
-const VERSION = 'RP 1.0';
+const VERSION = 'RP 1.1';
 const GRIS = '#3a3a3a';
 const H = {CFG: 'CONFIG', RUB: 'RUBRICA', REG: 'REGISTROS', DET: 'DETALLE', PAP: 'PAPELERA', BIT: 'BITACORA'};
 const CAB_RUB_FIJAS = ['Hito', 'Dimensión', 'Peso (%)', 'Se califica', 'Criterio', 'Descripción (opcional)', 'Puntaje máximo'];
-const CAB_REG = ['Fecha y hora', 'ID registro', 'Docente', 'Materia', 'Paralelo', 'Hito', 'Grupo / proyecto', 'N.º', 'Estudiante',
+const CAB_REG = ['Fecha y hora', 'ID registro', 'Docente', 'Semestre', 'Paralelo', 'Hito', 'Grupo / proyecto', 'N.º', 'Estudiante',
   'Nota final', 'Detalle por dimensión', 'Observaciones', 'Revisión', 'Versión app'];
-const CAB_DET = ['ID registro', 'Revisión', 'Hito', 'Docente', 'Materia', 'Paralelo', 'Grupo / proyecto', 'Estudiante',
+const CAB_DET = ['ID registro', 'Revisión', 'Hito', 'Docente', 'Semestre', 'Paralelo', 'Grupo / proyecto', 'Estudiante',
   'Dimensión', 'Peso (%)', 'Se califica', 'Criterio', 'Nivel', 'Puntos', 'Puntaje máximo'];
 const MAX_EST_ABS = 40;
 // Lectura de la rúbrica (compartido por la app y por el script; build.py lo incrusta en los dos).
@@ -93,7 +93,7 @@ var MOTOR = (function () {
   return {sinT: sinT, num: num, rango: rango, modo: modo, parsear: parsear, nota: nota, red: red};
 })();
 
-const SEED = {"niveles":["Cumple","Cumple parcialmente","No cumple"],"filas":[["Hito 2 · Semana 6","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,0],["Hito 2 · Semana 6","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,0],["Hito 2 · Semana 6","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,0],["Hito 2 · Semana 6","Procedimental",30,"Por grupo","Expresión oral","",15,15,8,0],["Hito 2 · Semana 6","Procedimental",30,"Por grupo","Análisis de la parte conceptual aplicada a la empresa","",15,15,8,0],["Hito 2 · Semana 6","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""],["Hito 3 · Semana 12","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,0],["Hito 3 · Semana 12","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,0],["Hito 3 · Semana 12","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,0],["Hito 3 · Semana 12","Procedimental",30,"Por grupo","Expresión oral","",15,15,8,0],["Hito 3 · Semana 12","Procedimental",30,"Por grupo","Análisis de la parte conceptual aplicada a la empresa","",15,15,8,0],["Hito 3 · Semana 12","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""],["Hito 4","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,0],["Hito 4","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,0],["Hito 4","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,0],["Hito 4","Procedimental",30,"Por grupo","Expresión oral","",15,15,8,0],["Hito 4","Procedimental",30,"Por grupo","Análisis de la parte conceptual aplicada a la empresa","",15,15,8,0],["Hito 4","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""],["Hito 5 · Semana 20","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,"0-3"],["Hito 5 · Semana 20","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,"0-3"],["Hito 5 · Semana 20","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,"0-3"],["Hito 5 · Semana 20","Procedimental",30,"Por grupo","Expresión oral","",10,10,8,"0-7"],["Hito 5 · Semana 20","Procedimental",30,"Por grupo","Análisis de la empresa, aplicando los conocimientos conceptuales obtenidos","",20,20,10,"0-9"],["Hito 5 · Semana 20","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""]]};
+const SEED = {"niveles":["Cumple","Cumple parcialmente","No cumple"],"filas":[["Hito 2","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,0],["Hito 2","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,0],["Hito 2","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,0],["Hito 2","Procedimental",30,"Por grupo","Expresión oral","",15,15,8,0],["Hito 2","Procedimental",30,"Por grupo","Análisis de la parte conceptual aplicada a la empresa","",15,15,8,0],["Hito 2","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""],["Hito 3","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,0],["Hito 3","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,0],["Hito 3","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,0],["Hito 3","Procedimental",30,"Por grupo","Expresión oral","",15,15,8,0],["Hito 3","Procedimental",30,"Por grupo","Análisis de la parte conceptual aplicada a la empresa","",15,15,8,0],["Hito 3","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""],["Hito 4","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,0],["Hito 4","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,0],["Hito 4","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,0],["Hito 4","Procedimental",30,"Por grupo","Expresión oral","",15,15,8,0],["Hito 4","Procedimental",30,"Por grupo","Análisis de la parte conceptual aplicada a la empresa","",15,15,8,0],["Hito 4","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""],["Hito 5","Conceptual",30,"Por grupo","Conocimiento del tema","",10,10,5,"0-3"],["Hito 5","Conceptual",30,"Por grupo","Contenido y pertinencia","",10,10,5,"0-3"],["Hito 5","Conceptual",30,"Por grupo","Redacción y ortografía","",10,10,5,"0-3"],["Hito 5","Procedimental",30,"Por grupo","Expresión oral","",10,10,8,"0-7"],["Hito 5","Procedimental",30,"Por grupo","Análisis de la empresa, aplicando los conocimientos conceptuales obtenidos","",20,20,10,"0-9"],["Hito 5","Actitudinal",40,"Por estudiante","Expone su proyecto con seguridad, demuestra dominio del tema, utilizando lenguaje académico","",40,"","",""]]};
 
 function ss_() { return SpreadsheetApp.getActive(); }
 function hoja_(n) { return ss_().getSheetByName(n); }
@@ -111,13 +111,16 @@ function cabecera_(sh, cab) {
   sh.setFrozenRows(1);
 }
 function config_() {
-  const sh = hoja_(H.CFG), o = {abierta: true, titulo: 'Rúbrica de evaluación procesual', hitos: [], maxEst: 7, clave: '', mensaje: 'El registro de la rúbrica está cerrado por ahora.'};
+  const lista = function (v) { return v ? v.split(/[;\n]/).map(function (x) { return x.trim(); }).filter(String) : []; };
+  const sh = hoja_(H.CFG), o = {abierta: true, titulo: 'Rúbrica de evaluación procesual', hitos: [], semestres: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], paralelos: [], maxEst: 7, clave: '', mensaje: 'El registro de la rúbrica está cerrado por ahora.'};
   if (!sh || sh.getLastRow() < 2) return o;
   sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(function (r) {
     const k = MOTOR.sinT(r[0]), v = String(r[1] === null ? '' : r[1]).trim();
     if (k.indexOf('abiert') >= 0) o.abierta = !/^no$/i.test(v);
     else if (k.indexOf('titulo') >= 0) { if (v) o.titulo = v; }
-    else if (k.indexOf('hitos') >= 0) o.hitos = v ? v.split(/[;\n]/).map(function (x) { return x.trim(); }).filter(String) : [];
+    else if (k.indexOf('hitos') >= 0) o.hitos = lista(v);
+    else if (k.indexOf('semestre') >= 0) { if (v) o.semestres = lista(v); }
+    else if (k.indexOf('paralelo') >= 0) o.paralelos = lista(v);
     else if (k.indexOf('maximo') >= 0) { const n = parseInt(v, 10); if (n > 0) o.maxEst = Math.min(n, MAX_EST_ABS); }
     else if (k.indexOf('clave') >= 0) o.clave = v;
     else if (k.indexOf('mensaje') >= 0) { if (v) o.mensaje = v; }
@@ -150,15 +153,17 @@ function configuracionInicial() {
   let sh = crear(H.CFG);
   if (sh.getLastRow() < 2) {
     cabecera_(sh, ['Parámetro', 'Valor', 'Ayuda']);
-    sh.getRange(2, 1, 6, 3).setValues([
+    sh.getRange(2, 1, 8, 3).setValues([
       ['Registro abierto', 'SÍ', 'SÍ = los docentes pueden guardar. NO = la app muestra el mensaje de cerrado.'],
       ['Título de la rúbrica', 'Rúbrica de evaluación procesual', 'Aparece arriba en la app.'],
       ['Hitos habilitados', '', 'Vacío = todos los de la pestaña RUBRICA. Para limitar, escribe los nombres exactos separados por «;».'],
       ['Máximo de estudiantes por grupo', 7, 'Cuántos nombres puede poner un docente en un grupo.'],
       ['Clave para docentes', '', 'Vacío = sin clave. Si escribes una, la app la pide una vez a cada docente.'],
-      ['Mensaje cuando está cerrado', 'El registro de la rúbrica está cerrado por ahora.', '']
+      ['Mensaje cuando está cerrado', 'El registro de la rúbrica está cerrado por ahora.', ''],
+      ['Semestres', '1; 2; 3; 4; 5; 6; 7; 8; 9; 10', 'Opciones que el docente elige en «Semestre», separadas por «;».'],
+      ['Paralelos', '', 'Vacío = el docente escribe su paralelo. Si pones la lista (separada por «;», por ejemplo P100; P101), solo puede elegir de ella.']
     ]);
-    sh.getRange(2, 2, 6, 1).setNumberFormat('@').setHorizontalAlignment('left');
+    sh.getRange(2, 2, 8, 1).setNumberFormat('@').setHorizontalAlignment('left');
     sh.setColumnWidth(1, 240); sh.setColumnWidth(2, 260); sh.setColumnWidth(3, 520);
     sh.getRange(2, 2).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['SÍ', 'NO'], true).build());
   }
@@ -222,9 +227,9 @@ function revisarRubrica() {
 function verAvance() {
   const sh = hoja_(H.REG); if (!sh || sh.getLastRow() < 2) { avisar_('Avance', 'Todavía no hay registros.'); return; }
   const v = sh.getRange(2, 1, sh.getLastRow() - 1, CAB_REG.length).getValues(), g = {};
-  v.forEach(function (r) { const k = r[2] + ' · ' + r[3] + ' ' + r[4] + ' · ' + r[5]; g[k] = g[k] || {ids: {}, n: 0}; g[k].ids[r[1]] = 1; g[k].n++; });
+  v.forEach(function (r) { const k = r[2] + ' · sem. ' + r[3] + ' ' + r[4] + ' · ' + r[5]; g[k] = g[k] || {ids: {}, n: 0}; g[k].ids[r[1]] = 1; g[k].n++; });
   const t = Object.keys(g).sort().map(function (k) { return k + ': ' + Object.keys(g[k].ids).length + ' grupo(s), ' + g[k].n + ' estudiante(s)'; });
-  avisar_('Avance (docente · materia paralelo · hito)', t.join('\n'));
+  avisar_('Avance (docente · semestre paralelo · hito)', t.join('\n'));
 }
 
 function filasDeId_(sh, col, id) {
@@ -298,7 +303,7 @@ function ping_() {
 function claveOk_(c) { const cfg = config_(); return !cfg.clave || String(c || '').trim() === cfg.clave; }
 function rubricaApp_() {
   const cfg = config_(), r = leerRubrica_(cfg.hitos);
-  return {ok: true, version: VERSION, abierta: cfg.abierta, mensaje: cfg.mensaje, titulo: cfg.titulo, maxEst: cfg.maxEst, clave: !!cfg.clave, niveles: r.niveles, hitos: r.hitos};
+  return {ok: true, version: VERSION, abierta: cfg.abierta, mensaje: cfg.mensaje, titulo: cfg.titulo, maxEst: cfg.maxEst, clave: !!cfg.clave, semestres: cfg.semestres, paralelos: cfg.paralelos, niveles: r.niveles, hitos: r.hitos};
 }
 function verificar_(p) {
   const sh = hoja_(H.REG), id = String(p.id || ''), rev = String(p.rev || '');
@@ -312,7 +317,7 @@ function guardar_(d) {
   if (!cfg.abierta) return {ok: false, codigo: 'cerrada', mensaje: cfg.mensaje};
   if (cfg.clave && String(d.clave || '').trim() !== cfg.clave) return {ok: false, codigo: 'clave'};
   const id = String(d.id || '').toUpperCase(), rev = String(d.rev || '');
-  const docente = linea_(d.docente, 120), materia = linea_(d.materia, 120), paralelo = linea_(d.paralelo, 60), hito = linea_(d.hito, 120), grupo = linea_(d.grupo, 160);
+  const docente = linea_(d.docente, 120), semestre = linea_(d.semestre || d.materia, 60), paralelo = linea_(d.paralelo, 60), hito = linea_(d.hito, 120), grupo = linea_(d.grupo, 160);
   if (!/^RP-[A-Z0-9]{6,12}$/.test(id) || !/^\d{6,16}$/.test(rev)) return {ok: false, codigo: 'datos', mensaje: 'Identificador inválido.'};
   if (!docente || !hito) return {ok: false, codigo: 'datos', mensaje: 'Falta el nombre del docente o el hito.'};
   const est = Array.isArray(d.est) ? d.est : [];
@@ -326,11 +331,11 @@ function guardar_(d) {
       const dn = linea_(it.dim, 80), max = Math.max(0, Number(it.max) || 0), pts = Math.min(max, Math.max(0, Number(it.pts) || 0)), peso = Math.max(0, Number(it.peso) || 0);
       if (!porDim[dn]) { porDim[dn] = {nombre: dn, peso: peso, pts: 0, max: 0}; dims.push(porDim[dn]); }
       porDim[dn].pts += pts; porDim[dn].max += max;
-      filasDet.push([id, rev, hito, docente, materia, paralelo, grupo, nombre, dn, peso, it.modo === 'estudiante' ? 'Por estudiante' : 'Por grupo', linea_(it.crit, 300), linea_(it.nivel, 60), pts, max]);
+      filasDet.push([id, rev, hito, docente, semestre, paralelo, grupo, nombre, dn, peso, it.modo === 'estudiante' ? 'Por estudiante' : 'Por grupo', linea_(it.crit, 300), linea_(it.nivel, 60), pts, max]);
     });
     let total = 0;
     const detalle = dims.map(function (x) { const n = x.max ? x.pts / x.max * x.peso : 0; total += n; return x.nombre + ' ' + MOTOR.red(n, 1) + '/' + x.peso; }).join(' · ');
-    filasReg.push([ahora, id, docente, materia, paralelo, hito, grupo, i + 1, nombre, MOTOR.red(total, 2), detalle, txt_(d.obs, 2000), rev, linea_(d.version, 20)]);
+    filasReg.push([ahora, id, docente, semestre, paralelo, hito, grupo, i + 1, nombre, MOTOR.red(total, 2), detalle, txt_(d.obs, 2000), rev, linea_(d.version, 20)]);
   });
   if (!filasReg.length) return {ok: false, codigo: 'datos', mensaje: 'El grupo no tiene estudiantes.'};
   const lock = LockService.getScriptLock(); lock.waitLock(25000);

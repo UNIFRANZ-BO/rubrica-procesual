@@ -60,13 +60,11 @@ background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 6px 20px 
 .papel .enc .tot{text-align:center;border:1px solid var(--bd2);border-radius:14px;padding:6px 14px;background:rgba(255,255,255,.04)}
 .papel .enc .tot b{display:block;font-size:22px;line-height:1.1}
 .papel .enc .tot span{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}
-.tabs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:16px;background:rgba(0,0,0,.22);border:1px solid var(--bd);border-radius:14px;padding:5px;width:fit-content;max-width:100%}
-.tabs>span{font-size:12px;color:var(--mut);font-weight:700;margin:0 6px 0 8px;text-transform:uppercase;letter-spacing:1px}
-.tabs button{border:0;background:transparent;color:var(--mut);border-radius:10px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:650;cursor:pointer;transition:all .15s}
-.tabs button:hover{color:var(--tx);background:rgba(255,255,255,.06)}
-.tabs button.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#071022;box-shadow:0 6px 18px rgba(95,140,255,.35)}
-.meta{display:grid;grid-template-columns:2fr 2fr 1.2fr;gap:12px 14px;margin-bottom:20px}
-.meta .g2{grid-column:1/3}
+.tabs{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:18px;background:rgba(0,0,0,.22);border:1px solid var(--bd);border-radius:14px;padding:10px 14px}
+.tabs label{font-size:11.5px;color:var(--mut);font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.tabs select.inp{width:auto;min-width:230px;font-weight:700;font-size:15px;padding:9px 12px;background:rgba(95,180,255,.1);border-color:rgba(95,180,255,.45)}
+.tabs small{flex:1 1 240px;color:var(--mut);font-size:12.5px}
+.meta{display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:12px 14px;margin-bottom:20px}
 .meta label,.obs label{display:block;font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px}
 .papel .inp{width:100%;background:rgba(0,0,0,.28);border:1px solid var(--bd2);color:var(--tx);border-radius:11px;padding:11px 12px;font:inherit;outline:none;transition:border .15s,box-shadow .15s}
 .papel .inp::placeholder{color:#6f7b93}
@@ -133,7 +131,7 @@ table.te tr.falta .inp{border-color:var(--ama);background:rgba(255,207,90,.08)}
   .papel{padding:16px 12px;border-radius:18px}
   .papel .enc{gap:12px} .papel .enc img{height:36px} .papel .enc h1{font-size:17px} .papel .enc small{font-size:10px;letter-spacing:1.5px}
   .papel .enc .tot{padding:4px 9px} .papel .enc .tot b{font-size:17px}
-  .tabs{width:100%}.tabs>span{display:none}.tabs button{flex:1 1 auto;padding:8px 8px;font-size:12.5px}
+  .tabs select.inp{width:100%;min-width:0}
   .meta{grid-template-columns:1fr 1fr}.meta .g2,.meta .g1{grid-column:1/-1}
   .gg{grid-template-columns:1fr}.gdim{grid-column:auto!important}
   .gcs{grid-template-columns:1fr}.gc{border-left:0;border-top:1px solid var(--bd)}.gc:first-child{border-top:0}
@@ -215,13 +213,13 @@ footer span{cursor:pointer;user-select:none}
       <div class="enc"><img src="__LOGO_FULL__" alt="UNIFRANZ"><div class="et"><small id="hSub">Rúbrica de evaluación procesual</small><h1 id="hTit"></h1></div><div class="tot"><b id="hTot">100</b><span>puntos</span></div></div>
       <div class="tabs" id="tabs"></div>
       <div class="meta">
-        <div><label for="iDocente">Docente</label><input class="inp" id="iDocente" autocomplete="name" maxlength="120" placeholder="Tu nombre completo"></div>
-        <div><label for="iMateria">Materia</label><input class="inp" id="iMateria" maxlength="120" placeholder="Ej.: Administración Gerencial" list="dlMat"></div>
-        <div><label for="iParalelo">Paralelo</label><input class="inp" id="iParalelo" maxlength="60" placeholder="Ej.: ADM-S2-P107" list="dlPar"></div>
+        <div class="g2"><label for="iDocente">Docente</label><input class="inp" id="iDocente" autocomplete="name" maxlength="120" placeholder="Tu nombre completo"></div>
+        <div><label for="iSemestre">Semestre</label><select class="inp" id="iSemestre"></select></div>
+        <div id="cajaPar"></div>
         <div class="g2"><label for="iGrupo">Grupo / proyecto <span style="text-transform:none;font-weight:500">(opcional)</span></label><input class="inp" id="iGrupo" maxlength="160" placeholder="Ej.: Grupo 3 · Café Andino"></div>
         <div class="g1 oculto" id="bloqueClave"><label for="iClave">Clave docente</label><input class="inp" id="iClave" type="password" maxlength="60" autocomplete="off"></div>
       </div>
-      <datalist id="dlMat"></datalist><datalist id="dlPar"></datalist><datalist id="dlNombres"></datalist>
+      <datalist id="dlPar"></datalist><datalist id="dlNombres"></datalist>
       <div class="gg" id="gg"></div>
       <div id="ind"></div>
       <div class="obs"><label for="iObs">Observaciones para el grupo (opcional)</label><textarea class="inp" id="iObs" maxlength="2000" placeholder="Fortalezas, aspectos a mejorar…"></textarea></div>
@@ -247,7 +245,7 @@ footer span{cursor:pointer;user-select:none}
     <div class="btns"><button class="btn sec" id="bRegsAtras">← Volver a la rúbrica</button></div>
   </div></section>
 
-  <footer>UNIFRANZ · Rúbrica procesual · <span id="ver">v2.0</span></footer>
+  <footer>UNIFRANZ · Rúbrica procesual · <span id="ver">v2.3</span></footer>
 </div>
 
 <div class="barra oculto" id="barra"><div class="in">
@@ -259,7 +257,7 @@ footer span{cursor:pointer;user-select:none}
 
 <script>
 const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbyWnkZy80i45SyPhLlouvxa5mdDHhs8y677VkCuWH7kQm-30S4mQ7U3ZZgJPCeirCxnfA/exec';   // URL de la aplicación web de Apps Script. Vacía = modo de prueba.
-const VERSION = '2.0';
+const VERSION = '2.3';
 /*__MOTOR__*/
 const RUB_DEMO = /*__RUB_DEMO__*/null;
 
@@ -284,7 +282,9 @@ const uid = () => 'u' + Date.now().toString(36) + Math.random().toString(36).sli
 const nuevoId = () => 'RP-' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b => '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ'[b % 34]).join('');
 
 let RUB = null;
-let PERFIL = lsGet('perfil', {docente: '', materia: '', paralelo: '', hito: '', clave: ''});
+let PERFIL = Object.assign({docente: '', semestre: '', paralelo: '', hito: '', clave: ''}, lsGet('perfil', {}));
+const SEMESTRES_DEF = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+const semTxt = v => /^\d+$/.test(v) ? v + '.º semestre' : v;
 let REGS = lsGet('regs', []);
 let EV = null;                               // la rúbrica que se está llenando
 
@@ -438,12 +438,18 @@ function faltan() {
 function pintarHoja() {
   const h = EV.rub;
   $('#hTit').textContent = h.id; $('#hSub').textContent = RUB.titulo || 'Rúbrica de evaluación procesual'; $('#hTot').textContent = fmt(h.total || 100);
-  $('#tabs').innerHTML = '<span>Hito:</span>' + RUB.hitos.map(x => `<button type="button" data-h="${esc(x.id)}" class="${x.id === EV.hito ? 'on' : ''}">${esc(x.id)}</button>`).join('');
-  $('#iDocente').value = PERFIL.docente; $('#iMateria').value = PERFIL.materia; $('#iParalelo').value = PERFIL.paralelo; $('#iClave').value = PERFIL.clave || '';
+  $('#tabs').classList.toggle('oculto', RUB.hitos.length < 2);     // con un solo hito habilitado en CONFIG no hay nada que elegir
+  $('#tabs').innerHTML = `<label for="selHito">Hito a evaluar</label><select class="inp" id="selHito">${RUB.hitos.map(x => `<option value="${esc(x.id)}" ${x.id === EV.hito ? 'selected' : ''}>${esc(x.id)}</option>`).join('')}</select>
+    <small>Cada hito es una evaluación aparte: llenas y envías solo el hito que elijas aquí.</small>`;
+  $('#iDocente').value = PERFIL.docente;
+  const sems = RUB.semestres && RUB.semestres.length ? RUB.semestres : SEMESTRES_DEF, pars = RUB.paralelos || [];
+  $('#iSemestre').innerHTML = `<option value="">Elige…</option>` + sems.map(v => `<option value="${esc(v)}" ${v === PERFIL.semestre ? 'selected' : ''}>${esc(semTxt(v))}</option>`).join('');
+  $('#cajaPar').innerHTML = '<label for="iParalelo">Paralelo</label>' + (pars.length
+    ? `<select class="inp" id="iParalelo"><option value="">Elige…</option>${pars.map(v => `<option value="${esc(v)}" ${v === PERFIL.paralelo ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>`
+    : `<input class="inp" id="iParalelo" maxlength="60" placeholder="Ej.: P107" list="dlPar" value="${esc(PERFIL.paralelo)}">`); $('#iClave').value = PERFIL.clave || '';
   $('#iGrupo').value = EV.grupo || ''; $('#iObs').value = EV.obs || '';
   $('#bloqueClave').classList.toggle('oculto', !RUB.clave);
   const uniq = k => [...new Set(REGS.map(r => r[k]).filter(Boolean))];
-  $('#dlMat').innerHTML = uniq('materia').map(x => `<option value="${esc(x)}">`).join('');
   $('#dlPar').innerHTML = uniq('paralelo').map(x => `<option value="${esc(x)}">`).join('');
   pintarAvisos(); pintarGrupal(); pintarEstudiantes(); refrescar();
 }
@@ -519,7 +525,6 @@ function repintarGC(di, ci) { const el = $('#gc_' + K(di, ci)); if (!el) return;
 const hoja = $('#sHoja');
 hoja.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.h !== undefined && b.closest('#tabs')) return cambiarHito(b.dataset.h);
   if (b.closest('.gl')) {
     const di = +b.dataset.di, ci = +b.dataset.ci, n = EV.rub.dims[di].crit[ci].nv[+b.dataset.k], o = celda(di, ci);
     setCelda(di, ci, null, o && o.nv === n.n ? null : {nv: n.n, p: n.b}); return repintarGC(di, ci);
@@ -531,7 +536,8 @@ hoja.addEventListener('change', e => {
   if (t.matches('select[data-fino]')) { const f = t.closest('.fino'), di = +f.dataset.di, ci = +f.dataset.ci; setCelda(di, ci, null, {nv: celda(di, ci).nv, p: +t.value}); return repintarGC(di, ci); }
   if (t.matches('select.sc')) { const di = +t.dataset.di, ci = +t.dataset.ci, n = EV.rub.dims[di].crit[ci]; if (!t.value) setCelda(di, ci, t.dataset.u, null); else { const [k, p] = t.value.split('|'); setCelda(di, ci, t.dataset.u, {nv: n.nv[+k].n, p: +p}); } return refrescar(); }
   if (t.matches('input.nom')) { const s = EV.est.find(x => x.u === t.dataset.u), v = nombrePropio(t.value); if (s) { s.n = v; t.value = v; } avisarDuplicado(t); return refrescar(); }
-  if (t.matches('#iDocente,#iMateria,#iParalelo,#iClave')) return guardarPerfil();
+  if (t.id === 'selHito') return cambiarHito(t.value);
+  if (t.matches('#iDocente,#iSemestre,#iParalelo,#iClave')) return guardarPerfil();
 });
 hoja.addEventListener('input', e => {
   const t = e.target;
@@ -570,23 +576,23 @@ function avisarDuplicado(t) {
   if (EV.est.filter(s => MOTOR.sinT(s.n) === v).length > 1) toast('Ese nombre ya está en otra fila.', true);
 }
 function guardarPerfil() {
-  PERFIL.docente = $('#iDocente').value.replace(/\s+/g, ' ').trim(); PERFIL.materia = $('#iMateria').value.replace(/\s+/g, ' ').trim();
-  PERFIL.paralelo = $('#iParalelo').value.replace(/\s+/g, ' ').trim().toUpperCase(); PERFIL.clave = $('#iClave').value.trim(); PERFIL.hito = EV ? EV.hito : PERFIL.hito;
-  $('#iParalelo').value = PERFIL.paralelo; lsSet('perfil', PERFIL); refrescar();
+  PERFIL.docente = $('#iDocente').value.replace(/\s+/g, ' ').trim(); PERFIL.semestre = $('#iSemestre').value;
+  const pv = $('#iParalelo').value.replace(/\s+/g, ' ').trim(); PERFIL.paralelo = $('#iParalelo').tagName === 'INPUT' ? pv.toUpperCase() : pv; PERFIL.clave = $('#iClave').value.trim(); PERFIL.hito = EV ? EV.hito : PERFIL.hito;
+  if ($('#iParalelo').tagName === 'INPUT') $('#iParalelo').value = PERFIL.paralelo; lsSet('perfil', PERFIL); refrescar();
 }
 async function cambiarHito(id) {
   if (!EV || id === EV.hito) return;
   if (Object.keys(EV.g).length || Object.values(EV.i).some(o => Object.keys(o).length)) {
     const v = await modal(`<h2>¿Cambiar a ${esc(id)}?</h2><p class="mut">Se borran las calificaciones que marcaste. Los nombres de los estudiantes se mantienen.</p>`, [{t: 'Cambiar de hito', v: 1}, {t: 'Cancelar', v: 0, sec: 1}]);
-    if (!v) return;
+    if (!v) { $('#selHito').value = EV.hito; return; }
   }
   const est = EV.est, grupo = EV.grupo, obs = EV.obs, id0 = EV.rev ? EV.id : null;
   EV = nuevoEV(hitoPorId(id), est); EV.grupo = grupo; EV.obs = obs; if (id0) EV.id = nuevoId();
   PERFIL.hito = id; lsSet('perfil', PERFIL); rellenar(); pintarHoja();
 }
 function conocidos() {
-  const mismo = [], otros = [], mat = PERFIL.materia, par = PERFIL.paralelo;
-  REGS.forEach(r => (r.paralelo === par && r.materia === mat ? mismo : otros).push(...r.est.map(s => s.n)));
+  const mismo = [], otros = [], par = PERFIL.paralelo, sem = PERFIL.semestre;
+  REGS.forEach(r => (r.paralelo === par && (r.semestre || '') === sem ? mismo : otros).push(...r.est.map(s => s.n)));
   return [...new Set([...mismo, ...otros])].filter(Boolean);
 }
 function previos() {
@@ -596,7 +602,7 @@ function previos() {
 }
 async function elegirPrevio() {
   const p = previos();
-  const v = await modal(`<h2>Integrantes de un grupo anterior</h2><div class="lst">${p.map((r, i) => `<button data-v="${i}"><b>${esc(r.grupo || r.est[0].n)}</b><small>${esc(r.hito)} · ${esc(r.materia)} ${esc(r.paralelo)} · ${esc(r.est.map(s => s.n).join(', '))}</small></button>`).join('')}</div>`, [{t: 'Cancelar', v: '', sec: 1}]);
+  const v = await modal(`<h2>Integrantes de un grupo anterior</h2><div class="lst">${p.map((r, i) => `<button data-v="${i}"><b>${esc(r.grupo || r.est[0].n)}</b><small>${esc(r.hito)} · ${esc(semTxt(r.semestre || ''))} ${esc(r.paralelo)} · ${esc(r.est.map(s => s.n).join(', '))}</small></button>`).join('')}</div>`, [{t: 'Cancelar', v: '', sec: 1}]);
   if (v === '' || v === undefined) return;
   const r = p[+v]; if (!EV.grupo && r.grupo) EV.grupo = r.grupo;
   const ya = new Set(EV.est.map(s => MOTOR.sinT(s.n)));
@@ -607,7 +613,7 @@ async function elegirPrevio() {
 /* ───────── enviar todo ───────── */
 function payload(r) {
   const crits = []; r.rub.dims.forEach((d, di) => d.crit.forEach((c, ci) => crits.push({d, di, c, ci})));
-  return {id: r.id, rev: String(r.rev), version: VERSION, clave: PERFIL.clave || '', docente: r.docente, materia: r.materia, paralelo: r.paralelo, hito: r.hito, grupo: r.grupo, obs: r.obs || '',
+  return {id: r.id, rev: String(r.rev), version: VERSION, clave: PERFIL.clave || '', docente: r.docente, semestre: r.semestre || '', materia: r.semestre || '', paralelo: r.paralelo, hito: r.hito, grupo: r.grupo, obs: r.obs || '',
     est: r.est.filter(s => s.n.trim()).map(s => ({nombre: s.n.trim(), items: crits.map(({d, di, c, ci}) => { const o = (d.modo === 'estudiante' ? (r.i[s.u] || {}) : r.g)[K(di, ci)] || {}; return {dim: d.nombre, peso: d.peso, modo: d.modo, crit: c.nombre, nivel: o.nv || '', pts: +o.p || 0, max: c.max}; })}))};
 }
 function guardarRegs() { lsSet('regs', REGS.slice(-300)); }
@@ -615,7 +621,7 @@ function irA(el) { if (!el) return; el.scrollIntoView({behavior: QUIETO ? 'auto'
 $('#bEnviar').onclick = async () => {
   guardarPerfil();
   if (RUB.abierta === false) return toast(RUB.mensaje || 'El registro está cerrado.', true);
-  for (const [id, msg, min] of [['#iDocente', 'Escribe tu nombre (docente).', 3], ['#iMateria', 'Escribe la materia.', 1], ['#iParalelo', 'Escribe el paralelo.', 1]]) {
+  for (const [id, msg, min] of [['#iDocente', 'Escribe tu nombre (docente).', 3], ['#iSemestre', 'Elige el semestre.', 1], ['#iParalelo', 'Elige o escribe el paralelo.', 1]]) {
     const el = $(id); if (el.value.trim().length < min) { el.classList.add('err'); irA(el); el.focus({preventScroll: true}); setTimeout(() => el.classList.remove('err'), 2500); return toast(msg, true); }
   }
   if (RUB.clave && !PERFIL.clave) { irA($('#iClave')); $('#iClave').focus({preventScroll: true}); return toast('Escribe la clave docente.', true); }
@@ -626,7 +632,7 @@ $('#bEnviar').onclick = async () => {
   if (x.sinNombre) { irA($('#ind tr.falta')); return toast('Hay una nota sin el nombre del estudiante.', true); }
   if (x.f) { irA($('.gc.falta') || $('#ind tr.falta')); return toast(`Faltan ${x.f} calificaciones (marcadas en amarillo).`, true); }
   const dims = EV.rub.dims, filas = conNombre().map(s => { const n = notaDe(s.u); return `<tr><td>${esc(s.n)}</td>${n.dims.map(d => `<td>${fmt(d.nota)}</td>`).join('')}<td class="fin">${fmt(n.total)}</td></tr>`; }).join('');
-  const ok = await modal(`<p class="mut small" style="margin:0">${esc(EV.hito)} · ${esc(PERFIL.materia)} · ${esc(PERFIL.paralelo)}</p><h2>${esc(EV.grupo || 'Grupo sin nombre')}</h2>
+  const ok = await modal(`<p class="mut small" style="margin:0">${esc(EV.hito)} · ${esc(semTxt(PERFIL.semestre))} · ${esc(PERFIL.paralelo)}</p><h2>${esc(EV.grupo || 'Grupo sin nombre')}</h2>
     <table class="tabla"><tr><th>Estudiante</th>${dims.map(d => `<th>${esc(d.nombre.slice(0, 5))}.<br>/${fmt(d.peso)}</th>`).join('')}<th>Final</th></tr>${filas}</table>
     <p class="mut small">${API_OK ? (EV.rev ? 'Reemplaza la versión anterior en la hoja.' : 'Se envía todo a la hoja en un solo paso.') : 'Modo de prueba: queda solo en este dispositivo.'}</p>`,
     [{t: 'Enviar todo ✓', v: 1, ok: 1}, {t: 'Revisar', v: 0, sec: 1}]);
@@ -635,7 +641,7 @@ $('#bEnviar').onclick = async () => {
 async function enviarTodo() {
   const b = $('#bEnviar'); b.disabled = true; b.textContent = 'Enviando…';
   const revAnt = EV.rev;
-  EV.rev = Date.now(); EV.fecha = EV.rev; EV.docente = PERFIL.docente; EV.materia = PERFIL.materia; EV.paralelo = PERFIL.paralelo; EV.grupo = (EV.grupo || '').replace(/\s+/g, ' ').trim();
+  EV.rev = Date.now(); EV.fecha = EV.rev; EV.docente = PERFIL.docente; EV.semestre = PERFIL.semestre; EV.paralelo = PERFIL.paralelo; EV.grupo = (EV.grupo || '').replace(/\s+/g, ' ').trim();
   const r = clon(EV); r.est = r.est.filter(s => s.n.trim()); delete r.intento; r.notas = r.est.map(s => MOTOR.red(notaDe(s.u).total, 1));
   let estado = 'pru';
   try {
@@ -665,7 +671,7 @@ const BADGE = {env: ['env', 'En la hoja'], pen: ['pen', 'Pendiente'], pru: ['pru
 function pintarRegs() {
   const l = [...REGS].reverse();
   $('#lRegs').innerHTML = l.length ? l.map(r => `<div class="reg" data-id="${r.id}"><div class="ri"><b>${esc(r.grupo || r.est.map(s => s.n.split(' ')[0]).join(', '))}</b>
-    <span class="mut small">${esc(r.hito)} · ${esc(r.materia)} ${esc(r.paralelo)} · ${r.est.length} est. · ${fechaHora(r.fecha)}</span>${r.err ? `<br><span class="small" style="color:var(--bad)">${esc(r.err)}</span>` : ''}</div>
+    <span class="mut small">${esc(r.hito)} · ${esc(semTxt(r.semestre || ''))} ${esc(r.paralelo)} · ${r.est.length} est. · ${fechaHora(r.fecha)}</span>${r.err ? `<br><span class="small" style="color:var(--bad)">${esc(r.err)}</span>` : ''}</div>
     <span class="badge ${BADGE[r.estado][0]}">${BADGE[r.estado][1]}</span></div>`).join('') : '<p class="mut">Todavía no llenaste ninguna rúbrica en este dispositivo.</p>';
   $$('#lRegs .reg').forEach(e => e.onclick = () => verReg(e.dataset.id));
 }
@@ -674,13 +680,13 @@ async function verReg(id) {
   const ops = [{t: 'Corregir', v: 'ed'}];
   if (r.estado === 'pen' || r.estado === 'err') ops.push({t: 'Reintentar envío', v: 're'});
   ops.push({t: 'Cerrar', v: '', sec: 1});
-  const v = await modal(`<p class="mut small" style="margin:0">${esc(r.hito)} · ${esc(r.materia)} ${esc(r.paralelo)}</p><h2>${esc(r.grupo || 'Grupo sin nombre')}</h2>
+  const v = await modal(`<p class="mut small" style="margin:0">${esc(r.hito)} · ${esc(semTxt(r.semestre || ''))} ${esc(r.paralelo)}</p><h2>${esc(r.grupo || 'Grupo sin nombre')}</h2>
     <table class="tabla"><tr><th>Estudiante</th><th>Nota</th></tr>${r.est.map((s, i) => `<tr><td>${esc(s.n)}</td><td class="fin">${fmt(r.notas ? r.notas[i] : 0)}</td></tr>`).join('')}</table><p class="mut small">ID ${r.id}</p>`, ops);
   if (v === 'ed') {
     if (RUB.abierta === false) return toast(RUB.mensaje || 'El registro está cerrado.', true);
     if (EV && tieneDatos() && !EV.rev) { const s = await modal('<h2>¿Dejar la rúbrica que estás llenando?</h2><p class="mut">Lo que marcaste y aún no enviaste se pierde.</p>', [{t: 'Sí, corregir la otra', v: 1}, {t: 'Cancelar', v: 0, sec: 1}]); if (!s) return; }
     EV = clon(r); delete EV.estado; delete EV.err; delete EV.notas; rellenar();
-    PERFIL.materia = r.materia; PERFIL.paralelo = r.paralelo; PERFIL.docente = r.docente || PERFIL.docente; lsSet('perfil', PERFIL);
+    PERFIL.paralelo = r.paralelo; PERFIL.semestre = r.semestre || PERFIL.semestre; PERFIL.docente = r.docente || PERFIL.docente; lsSet('perfil', PERFIL);
     pintarHoja(); ir('sHoja');
   } else if (v === 're') { r.estado = 'pen'; r.err = ''; guardarRegs(); pintarRegs(); toast('Enviando…'); vaciarCola(); }
 }

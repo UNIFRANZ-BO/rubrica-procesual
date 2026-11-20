@@ -43,7 +43,10 @@ S.configuracionInicial();
 assert.ok(hojas.RUBRICA && hojas.CONFIG && hojas.REGISTROS && hojas.DETALLE, 'pestañas');
 let r = get({action: 'rubrica'});
 assert.ok(r.ok && r.abierta, 'rubrica ok');
-assert.deepStrictEqual(r.hitos.map(h => h.id), ['Hito 2 · Semana 6', 'Hito 3 · Semana 12', 'Hito 4', 'Hito 5 · Semana 20']);
+assert.deepStrictEqual(r.semestres, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']); assert.deepStrictEqual(r.paralelos, []);
+hojas.CONFIG.d[8][1] = 'P100; P101'; assert.deepStrictEqual(get({action: 'rubrica'}).paralelos, ['P100', 'P101']);
+assert.strictEqual(hojas.REGISTROS.d[0][3], 'Semestre');
+assert.deepStrictEqual(r.hitos.map(h => h.id), ['Hito 2', 'Hito 3', 'Hito 4', 'Hito 5']);
 const h5 = r.hitos[3];
 assert.strictEqual(h5.total, 100);
 assert.deepStrictEqual(h5.dims.map(d => [d.nombre, d.peso, d.modo, d.crit.length]), [['Conceptual', 30, 'grupo', 3], ['Procedimental', 30, 'grupo', 2], ['Actitudinal', 40, 'estudiante', 1]]);
@@ -54,9 +57,9 @@ assert.strictEqual(h5.dims[2].crit[0].nv.length, 0, 'actitudinal: puntaje direct
 const rub = hojas.RUBRICA.d;
 rub[0][10] = 'Destacado';                                          // nuevo nivel (columna K)
 rub.push(['Hito 6', 'Saber', '50%', 'Por grupo', 'Criterio A', '', 10, 10, 'menor a 10', '', 'x'], ['Hito 6', 'Hacer', '', 'Por estudiante', 'Criterio B', 'desc', 20, '', '', '', '']);
-hojas.CONFIG.d[3][1] = 'Hito 5 · Semana 20; hito 6';
+hojas.CONFIG.d[3][1] = 'Hito 5; hito 6';
 r = get({action: 'rubrica'});
-assert.deepStrictEqual(r.hitos.map(h => h.id), ['Hito 5 · Semana 20', 'Hito 6'], 'hitos habilitados');
+assert.deepStrictEqual(r.hitos.map(h => h.id), ['Hito 5', 'Hito 6'], 'hitos habilitados');
 assert.deepStrictEqual(r.niveles, ['Cumple', 'Cumple parcialmente', 'No cumple', 'Destacado']);
 assert.deepStrictEqual(r.hitos[1].dims[0].crit[0].nv, [{n: 'Cumple', a: 10, b: 10}, {n: 'Cumple parcialmente', a: 0, b: 9}]);
 assert.strictEqual(r.hitos[1].dims[1].peso, 20, 'peso vacío = suma de máximos');
@@ -70,12 +73,13 @@ const items = (act) => [
   {dim: 'Procedimental', peso: 30, modo: 'grupo', crit: 'Expresión', nivel: 'Cumple', pts: 10, max: 10},
   {dim: 'Procedimental', peso: 30, modo: 'grupo', crit: 'Análisis', nivel: 'Cumple parcialmente', pts: 99, max: 20},   // se recorta a 20
   {dim: 'Actitudinal', peso: 40, modo: 'estudiante', crit: 'Expone', nivel: '', pts: act, max: 40}];
-const base = {id: 'RP-ABCDEFGH', rev: '1763650000000', version: '1.0', docente: 'Ana Pérez', materia: 'Adm. Gerencial', paralelo: 'ADM-S2-P107', hito: 'Hito 5 · Semana 20', grupo: '=Grupo 1', obs: 'Bien',
+const base = {id: 'RP-ABCDEFGH', rev: '1763650000000', version: '1.0', docente: 'Ana Pérez', semestre: '2', paralelo: 'ADM-S2-P107', hito: 'Hito 5', grupo: '=Grupo 1', obs: 'Bien',
   est: [{nombre: 'Juan Quispe', items: items(35)}, {nombre: 'Lucía Rojas', items: items(28)}]};
 r = post(base); assert.ok(r.ok, JSON.stringify(r));
 let reg = hojas.REGISTROS.d;
 assert.strictEqual(reg.length, 3);
 assert.strictEqual(reg[1][9], 18 + 30 + 35, 'nota final Juan');
+assert.strictEqual(reg[1][3], '2', 'semestre');
 assert.strictEqual(reg[2][9], 18 + 30 + 28);
 assert.strictEqual(reg[1][6], "'=Grupo 1", 'texto con = protegido');
 assert.strictEqual(reg[1][10], 'Conceptual 18/30 · Procedimental 30/30 · Actitudinal 35/40');

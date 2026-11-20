@@ -11,7 +11,7 @@ node = shutil.which('node') or r'C:\Program Files\nodejs\node.exe'
 rub = json.loads((raiz / 'rubrica.json').read_text(encoding='utf-8'))
 hitos = json.loads(subprocess.run([node, '-e', (raiz / 'motor.js').read_text(encoding='utf-8') + f'\nconsole.log(JSON.stringify(MOTOR.parsear({json.dumps(rub["niveles"])},{json.dumps(rub["filas"], ensure_ascii=False)},[]).hitos))'],
                                   capture_output=True, text=True, encoding='utf-8').stdout)
-H5 = 'Hito 5 · Semana 20'
+H5 = 'Hito 5'
 errores = []
 
 
@@ -33,13 +33,13 @@ with sync_playwright() as pw:
     p.on('pageerror', lambda e: errores.append(str(e)))
     p.goto(URL + '?api=prueba'); p.wait_for_selector('#sHoja.on')
     assert 'Modo de prueba' in p.inner_text('#avisos')
-    assert p.inner_text('#hTit') == H5 and p.locator('#tabs button.on').inner_text() == H5
-    assert p.locator('#tabs button').count() == 4
+    assert p.inner_text('#hTit') == H5 and p.input_value('#selHito') == H5
+    assert p.locator('#selHito option').count() == 4
     assert p.locator('.gc').count() == 5 and p.locator('#ind input.nom').count() == 7
     p.screenshot(path=str(out / '01_hoja_vacia_movil.png'), full_page=True)
     p.click('#bEnviar'); p.wait_for_timeout(300)
     assert p.locator('#modal.on').count() == 0, 'incompleta no abre el resumen'
-    p.fill('#iDocente', 'Rafael Aramayo'); p.fill('#iMateria', 'Administración Gerencial'); p.fill('#iParalelo', 'adm-s2-p107'); p.press('#iParalelo', 'Tab')
+    p.fill('#iDocente', 'Rafael Aramayo'); p.select_option('#iSemestre', '2'); p.fill('#iParalelo', 'adm-s2-p107'); p.press('#iParalelo', 'Tab')
     p.fill('#iGrupo', 'Grupo 3 · Café Andino')
     # pegar una lista en la primera fila → se reparte
     p.locator('#ind input.nom').first.focus()
@@ -63,7 +63,7 @@ with sync_playwright() as pw:
     p.locator('#modalC button', has_text='Enviar todo').click(); p.wait_for_selector('#sFin.on')
     assert 'modo de prueba' in p.inner_text('#fTit')
     regs = p.evaluate("JSON.parse(localStorage.getItem('rubp1_regs'))")
-    assert len(regs) == 1 and regs[0]['estado'] == 'pru' and regs[0]['paralelo'] == 'ADM-S2-P107' and len(regs[0]['est']) == 3
+    assert len(regs) == 1 and regs[0]['estado'] == 'pru' and regs[0]['paralelo'] == 'ADM-S2-P107' and regs[0]['semestre'] == '2' and len(regs[0]['est']) == 3
     p.click('#bOtro'); p.wait_for_selector('#sHoja.on')
     assert p.locator('.gl button.on').count() == 0 and p.locator('#ind input.nom').first.input_value() == '', 'hoja limpia'
     assert p.input_value('#iDocente') == 'Rafael Aramayo', 'recuerda al docente'
@@ -71,14 +71,14 @@ with sync_playwright() as pw:
     assert p.locator('#ind input.nom').nth(2).input_value() == 'Lucía Rojas', 'repite integrantes'
     # cambiar de hito con notas marcadas pide confirmación y conserva los nombres
     p.locator('.gc').nth(0).locator('.gl button').nth(0).click()
-    p.locator('#tabs button', has_text='Hito 2').click(); p.wait_for_selector('#modal.on')
+    p.select_option('#selHito', 'Hito 2'); p.wait_for_selector('#modal.on')
     p.locator('#modalC button', has_text='Cambiar de hito').click()
-    assert p.inner_text('#hTit') == 'Hito 2 · Semana 6' and p.locator('.gl button.on').count() == 0
+    assert p.inner_text('#hTit') == 'Hito 2' and p.locator('.gl button.on').count() == 0
     assert p.locator('#ind input.nom').first.input_value() == 'Juan Pérez Quispe'
     assert '0–3' not in p.inner_text('#gg') and '15' in p.inner_text('#gg')
     # borrador: al recargar sigue ahí
     p.goto(URL + '?api=prueba'); p.wait_for_selector('#sHoja.on')
-    assert p.inner_text('#hTit') == 'Hito 2 · Semana 6' and p.locator('#ind input.nom').first.input_value() == 'Juan Pérez Quispe'
+    assert p.inner_text('#hTit') == 'Hito 2' and p.locator('#ind input.nom').first.input_value() == 'Juan Pérez Quispe'
     p.click('#bMisRegs'); p.wait_for_selector('#sRegs.on'); assert p.locator('.reg').count() == 1
     sw = p.evaluate('document.documentElement.scrollWidth'); assert sw <= 390, f'scroll horizontal {sw}'
     p.close()
@@ -92,7 +92,7 @@ with sync_playwright() as pw:
             d = json.loads(route.request.post_data)['data']; recibidos.append(d)
             return route.fulfill(status=200, content_type='application/json', body=json.dumps({'ok': True, 'id': d['id']}))
         a = q.get('action')
-        if a == 'rubrica': r = {'ok': True, 'titulo': 'Rúbrica procesual 2026', 'abierta': True, 'maxEst': 5, 'clave': False, 'niveles': rub['niveles'], 'hitos': hitos[2:]}
+        if a == 'rubrica': r = {'ok': True, 'titulo': 'Rúbrica procesual 2026', 'abierta': True, 'maxEst': 5, 'clave': False, 'semestres': ['1', '2', '3'], 'paralelos': ['P100', 'P101'], 'niveles': rub['niveles'], 'hitos': hitos[2:]}
         elif a == 'verificar': r = {'ok': True, 'existe': False}
         else: r = {'ok': True}
         body = json.dumps(r, ensure_ascii=False)
@@ -103,9 +103,11 @@ with sync_playwright() as pw:
     p.on('pageerror', lambda e: errores.append(str(e)))
     p.route('https://servidor.test/**', servidor)
     p.goto(URL + '?api=https://servidor.test/exec'); p.wait_for_selector('#sHoja.on')
-    assert p.text_content('#hSub') == 'Rúbrica procesual 2026' and p.locator('#tabs button').count() == 2
+    assert p.text_content('#hSub') == 'Rúbrica procesual 2026' and p.locator('#selHito option').count() == 2
     assert p.locator('#ind input.nom').count() == 5, 'máximo 5'
-    p.fill('#iDocente', 'Docente Uno'); p.fill('#iMateria', 'SIG'); p.fill('#iParalelo', 'P100')
+    assert p.locator('#tabs:not(.oculto)').count() == 1
+    assert p.locator('#iSemestre option').count() == 4 and p.locator('select#iParalelo option').count() == 3
+    p.fill('#iDocente', 'Docente Uno'); p.select_option('#iSemestre', '3'); p.select_option('#iParalelo', 'P101')
     nom = p.locator('#ind input.nom')
     for i, n in enumerate(['Ana Uno', 'Beto Dos', 'Ceci Tres']): nom.nth(i).fill(n); nom.nth(i).press('Tab')
     grupal(p)
@@ -114,7 +116,7 @@ with sync_playwright() as pw:
     p.click('#bEnviar'); p.locator('#modalC button', has_text='Enviar todo').click(); p.wait_for_selector('#sFin.on')
     assert p.inner_text('#fTit') == '¡Rúbrica enviada!', p.inner_text('#fTit')
     d = recibidos[0]
-    assert len(recibidos) == 1 and [e['nombre'] for e in d['est']] == ['Ana Uno', 'Beto Dos', 'Ceci Tres'] and d['hito'] == H5
+    assert len(recibidos) == 1 and [e['nombre'] for e in d['est']] == ['Ana Uno', 'Beto Dos', 'Ceci Tres'] and d['hito'] == H5 and d['semestre'] == '3' and d['paralelo'] == 'P101'
     assert d['est'][0]['items'][5] == {'dim': 'Actitudinal', 'peso': 40, 'modo': 'estudiante', 'crit': hitos[3]['dims'][2]['crit'][0]['nombre'], 'nivel': '', 'pts': 30, 'max': 40}
     assert d['est'][0]['items'][2]['nivel'] == 'No cumple' and d['est'][0]['items'][2]['pts'] == 2
     # corrección: mismo id, revisión nueva
@@ -125,6 +127,14 @@ with sync_playwright() as pw:
     assert len(recibidos) == 2 and recibidos[1]['id'] == d['id'] and recibidos[1]['rev'] != d['rev']
     assert recibidos[1]['est'][2]['items'][5]['pts'] == 12
     regs = p.evaluate("JSON.parse(localStorage.getItem('rubp1_regs'))"); assert len(regs) == 1 and regs[0]['estado'] == 'env'
+    # con un solo hito habilitado no aparece el selector
+    hitos_srv = hitos
+    hitos = hitos_srv[3:]
+    p.route('https://servidor.test/**', lambda route: (servidor(route) if 'rubrica' not in route.request.url else route.fulfill(status=200, content_type='application/javascript',
+        body=dict(urllib.parse.parse_qsl(urllib.parse.urlparse(route.request.url).query))['callback'] + '(' + json.dumps({'ok': True, 'titulo': 'X', 'abierta': True, 'maxEst': 7, 'clave': False, 'niveles': rub['niveles'], 'hitos': hitos}, ensure_ascii=False) + ');')))
+    p.evaluate("localStorage.removeItem('rubp1_ev')")
+    p.goto(URL + '?api=https://servidor.test/exec'); p.wait_for_selector('#sHoja.on')
+    assert p.locator('#tabs.oculto').count() == 1 and p.inner_text('#hTit') == H5
     b.close()
 
 assert not errores, errores
