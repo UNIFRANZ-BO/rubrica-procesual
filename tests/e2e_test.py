@@ -87,7 +87,7 @@ with sync_playwright() as pw:
             d = json.loads(route.request.post_data)['data']; recibidos.append(d)
             return route.fulfill(status=200, content_type='application/json', body=json.dumps({'ok': True, 'id': d['id']}))
         a = q.get('action')
-        if a == 'rubrica': r = {'ok': True, 'titulo': 'Rúbrica procesual 2026', 'abierta': True, 'maxEst': 5, 'clave': False, 'niveles': rub['niveles'], 'hitos': hitos[1:]}
+        if a == 'rubrica': r = {'ok': True, 'titulo': 'Rúbrica procesual 2026', 'abierta': True, 'maxEst': 5, 'clave': False, 'niveles': rub['niveles'], 'hitos': hitos[2:]}
         elif a == 'verificar': r = {'ok': True, 'existe': False}
         else: r = {'ok': True}
         body = json.dumps(r, ensure_ascii=False)
@@ -111,7 +111,7 @@ with sync_playwright() as pw:
     p.click('#bRevisar'); p.click('#bGuardar'); p.wait_for_selector('#sFin.on')
     assert p.inner_text('#fTit') == '¡Registro guardado!', p.inner_text('#fTit')
     assert len(recibidos) == 1 and len(recibidos[0]['est']) == 3 and recibidos[0]['hito'] == 'Hito 5 · Semana 20'
-    assert recibidos[0]['est'][0]['items'][5] == {'dim': 'Actitudinal', 'peso': 40, 'modo': 'estudiante', 'crit': hitos[2]['dims'][2]['crit'][0]['nombre'], 'nivel': '', 'pts': 30, 'max': 40}
+    assert recibidos[0]['est'][0]['items'][5] == {'dim': 'Actitudinal', 'peso': 40, 'modo': 'estudiante', 'crit': hitos[3]['dims'][2]['crit'][0]['nombre'], 'nivel': '', 'pts': 30, 'max': 40}
     # corrección: mismo id, revisión nueva
     p.click('#bFinRegs'); p.locator('.reg').first.click(); p.locator('#modalC button', has_text='Corregir').click()
     p.wait_for_selector('#sEval.on'); p.locator('.dim').nth(2).locator('.directo input.inp').nth(2).fill('12')

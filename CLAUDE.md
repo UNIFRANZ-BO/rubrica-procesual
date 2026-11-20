@@ -2,7 +2,7 @@
 
 Proyecto de Rafael Aramayo (creado 20-nov-2026). App para que los docentes califiquen grupos con una rúbrica
 genérica y los registros queden en Google Sheets. Viene de `RUBRICA PROCESUAL.xlsx` (copia en `docs/`, no va al repo):
-Hitos 2, 3 y 5 · Conceptual 30 % y Procedimental 30 % (por grupo) · Actitudinal 40 % (por estudiante, puntaje directo /40).
+Hitos 2, 3 y 5 (+ Hito 4 agregado el 20-nov a pedido de Rafael, copia del Hito 3; sin semana) · Conceptual 30 % y Procedimental 30 % (por grupo) · Actitudinal 40 % (por estudiante, puntaje directo /40).
 Castellano neutro (tú); Rafael no es programador: pasos exactos.
 
 ## Estructura
