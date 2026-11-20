@@ -35,7 +35,7 @@ with sync_playwright() as pw:
     # ───── 1) modo de prueba, celular ─────
     p = b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=2)
     p.on('pageerror', lambda e: errores.append(str(e)))
-    p.goto(URL); p.wait_for_selector('#sInicio.on')
+    p.goto(URL + '?api=prueba'); p.wait_for_selector('#sInicio.on')
     assert 'Modo de prueba' in p.inner_text('#avisoInicio')
     assert p.locator('#chHitos .chip.on').inner_text() == 'Hito 5 · Semana 20'
     p.screenshot(path=str(out / '01_inicio_movil.png'), full_page=True)
@@ -71,7 +71,7 @@ with sync_playwright() as pw:
     assert p.locator('#prevChips .chip').count() == 1, 'ofrece repetir integrantes'
     p.locator('#prevChips .chip').click(); assert p.locator('#lEst li').count() == 3
     p.fill('#iEst', 'Ju'); p.wait_for_timeout(100)
-    p.goto(URL); p.wait_for_selector('#modal.on'); assert 'sin terminar' in p.inner_text('#modalC')
+    p.goto(URL + '?api=prueba'); p.wait_for_selector('#modal.on'); assert 'sin terminar' in p.inner_text('#modalC')
     p.locator('#modalC button', has_text='Descartar').click()
     p.click('#bMisRegs'); p.wait_for_selector('#sRegs.on'); assert p.locator('.reg').count() == 1
     p.screenshot(path=str(out / '05_registros_movil.png'), full_page=True)

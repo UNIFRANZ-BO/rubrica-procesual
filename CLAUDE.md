@@ -31,8 +31,9 @@ Castellano neutro (tú); Rafael no es programador: pasos exactos.
 
 ## Estado (20-nov-2026)
 - [x] v1.0 publicada en modo de prueba; pruebas backend y e2e OK.
-- [ ] Rafael: pegar `Code.gs` en la hoja, «configuracionInicial», implementar y pasar la URL → incrustarla en `URL_SCRIPT`, `python build.py`, push, enlace `?v=2`.
-- [ ] Prueba real con docente «PRUEBA …» y luego «Borrar registros de prueba».
+- [x] Script pegado e implementado (20-nov): implementación `AKfycbyWnkZy…xnfA`, incrustada en `URL_SCRIPT`. Enlace vigente `?v=2`. Prueba real OK (RP-F6XVDT7Z, docente «PRUEBA Claude»).
+- [ ] Rafael: menú Rúbrica → Borrar registros de prueba antes de difundir.
+- Para probar sin escribir en la hoja: `?api=prueba`.
 
 ## Comandos
 ```bash
