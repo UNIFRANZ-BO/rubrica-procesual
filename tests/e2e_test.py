@@ -113,14 +113,14 @@ with sync_playwright() as pw:
             d = json.loads(route.request.post_data)['data']; recibidos.append(d)
             return route.fulfill(status=200, content_type='application/json', body=json.dumps({'ok': True, 'id': d['id']}))
         a = q.get('action')
-        if a == 'rubrica': r = {'ok': True, 'titulo': 'Rúbrica procesual 2026', 'abierta': True, 'maxEst': 5, 'clave': False, 'semestres': ['1', '2', '3'], 'carreras': ['ADM', 'ICO'], 'niveles': rub['niveles'], 'hitos': hitos_srv}
+        if a == 'rubrica': r = {'ok': True, 'titulo': 'Rúbrica procesual 2026', 'abierta': True, 'maxEst': max_srv, 'clave': False, 'semestres': ['1', '2', '3'], 'carreras': ['ADM', 'ICO'], 'niveles': rub['niveles'], 'hitos': hitos_srv}
         elif a == 'verificar': r = {'ok': True, 'existe': False}
         else: r = {'ok': True}
         body = json.dumps(r, ensure_ascii=False)
         if 'callback' in q: return route.fulfill(status=200, content_type='application/javascript', body=f"{q['callback']}({body});")
         return route.fulfill(status=200, content_type='application/json', body=body)
 
-    hitos_srv = hitos[2:]
+    hitos_srv = hitos[2:]; max_srv = 5
     p = b.new_page(viewport={'width': 1366, 'height': 900})
     p.on('pageerror', lambda e: errores.append(str(e)))
     p.route('https://servidor.test/**', servidor)
@@ -157,6 +157,16 @@ with sync_playwright() as pw:
     assert recibidos[1]['est'][2]['items'][5]['pts'] == 12 and recibidos[1]['obs'] == ''
     regs = p.evaluate("JSON.parse(localStorage.getItem('rubp1_regs'))"); assert len(regs) == 1 and regs[0]['estado'] == 'env'
     # con un solo hito habilitado no aparece el selector
+    # si en CONFIG bajan el máximo, la rúbrica a medio llenar se ajusta sin borrar nombres
+    p.click('#bOtro'); nom = p.locator('#ind input.nom'); nom.nth(0).fill('Ana Uno'); nom.nth(0).press('Tab'); nom.nth(3).fill('Dora Cuatro'); nom.nth(3).press('Tab')
+    max_srv = 2
+    p.goto(URL + '?api=https://servidor.test/exec'); p.wait_for_selector('#sHoja.on')
+    assert [n.input_value() for n in p.locator('#ind input.nom').all()] == ['Ana Uno', 'Dora Cuatro'], [n.input_value() for n in p.locator('#ind input.nom').all()]
+    max_srv = 1
+    p.goto(URL + '?api=https://servidor.test/exec'); p.wait_for_selector('#sHoja.on')
+    assert p.locator('#ind input.nom').count() == 2, 'no borra nombres escritos'
+    p.click('#bEnviar'); p.wait_for_function("document.querySelector('#toast').textContent.includes('máximo es 1')", timeout=5000)
+    max_srv = 5
     hitos_srv = hitos[3:]
     p.evaluate("localStorage.removeItem('rubp1_ev')")
     p.goto(URL + '?api=https://servidor.test/exec'); p.wait_for_selector('#sHoja.on')

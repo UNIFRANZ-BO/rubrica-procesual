@@ -336,7 +336,7 @@ footer span{cursor:pointer;user-select:none}
     <div class="btns"><button class="btn sec" id="bRegsAtras">← Volver a la rúbrica</button></div>
   </div></section>
 
-  <footer>UNIFRANZ · Rúbrica procesual · <span id="ver">v3.2</span></footer>
+  <footer>UNIFRANZ · Rúbrica procesual · <span id="ver">v3.2.1</span></footer>
 </div>
 
 <div class="barra oculto" id="barra"><div class="in">
@@ -349,7 +349,7 @@ footer span{cursor:pointer;user-select:none}
 
 <script>
 const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbyWnkZy80i45SyPhLlouvxa5mdDHhs8y677VkCuWH7kQm-30S4mQ7U3ZZgJPCeirCxnfA/exec';   // URL de la aplicación web de Apps Script. Vacía = modo de prueba.
-const VERSION = '3.2';
+const VERSION = '3.2.1';
 // Lectura de la rúbrica (compartido por la app y por el script; build.py lo incrusta en los dos).
 var MOTOR = (function () {
   function sinT(s) { return String(s === null || s === undefined ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim(); }
@@ -609,7 +609,11 @@ async function cargarRubrica() {
 const maxEst = () => RUB.maxEst || 7;
 function hitoPorId(id) { return RUB.hitos.find(h => h.id === id) || null; }
 function nuevoEV(h, est) { return {id: nuevoId(), rev: 0, hito: h.id, rub: clon(h), grupo: '', est: est || [], g: {}, i: {}, obs: ''}; }
-function rellenar() { EV.est.forEach(s => { if (s.c === undefined) s.c = carreraUnica(); }); while (EV.est.length < maxEst()) EV.est.push({u: uid(), n: '', c: carreraUnica()}); }
+function rellenar() {             // ajusta las filas al máximo de CONFIG: quita filas vacías de más (nunca borra nombres) o agrega las que falten
+  EV.est.forEach(s => { if (s.c === undefined) s.c = carreraUnica(); });
+  while (EV.est.length > maxEst()) { let i = EV.est.length - 1; while (i >= 0 && (EV.est[i].n.trim() || notasDeFila(EV.est[i].u))) i--; if (i < 0) break; EV.est.splice(i, 1); }
+  while (EV.est.length < maxEst()) EV.est.push({u: uid(), n: '', c: carreraUnica()});
+}
 function tieneDatos() { return Object.keys(EV.g).length || Object.values(EV.i).some(o => Object.keys(o).length) || EV.est.some(s => s.n.trim()) || EV.obs; }
 function listo() {
   $('#tTitulo').textContent = RUB.titulo || 'Rúbrica de evaluación procesual';
@@ -896,6 +900,7 @@ $('#bEnviar').onclick = async () => {
   EV.intento = true; pintarGrupal(); refrescar();
   const x = faltan(), nombres = conNombre().map(s => MOTOR.sinT(s.n));
   if (!x.n) { irA($('#ind')); $('#ind input.nom').focus({preventScroll: true}); return toast('Escribe el nombre de al menos un estudiante.', true); }
+  if (x.n > maxEst()) { irA($('#ind')); return toast(`El máximo es ${maxEst()} estudiantes por grupo: borra ${x.n - maxEst()} nombre(s).`, true); }
   if (new Set(nombres).size < nombres.length) { irA($('#ind')); return toast('Hay un nombre repetido en la lista de estudiantes.', true); }
   if (x.sinNombre) { irA($('#ind tr.falta')); return toast('Hay una nota sin el nombre del estudiante.', true); }
   if (x.f) { irA($('.gc.falta') || $('#ind tr.falta')); return toast(`Faltan ${x.f} calificaciones (marcadas en amarillo).`, true); }
