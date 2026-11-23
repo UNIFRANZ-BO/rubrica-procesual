@@ -687,7 +687,7 @@ async function elegirPrevio() {
 /* ───────── enviar todo ───────── */
 function payload(r) {
   const crits = []; r.rub.dims.forEach((d, di) => d.crit.forEach((c, ci) => crits.push({d, di, c, ci})));
-  return {id: r.id, rev: String(r.rev), version: VERSION, clave: PERFIL.clave || '', docente: r.docente, hito: r.hito, semestre: r.semestre || '', carrera: r.carrera || '', grupo: r.grupo, obs: r.obs || '',
+  return {id: r.id, rev: String(r.rev), version: 'v' + VERSION, clave: PERFIL.clave || '', docente: r.docente, hito: r.hito, semestre: r.semestre || '', carrera: r.carrera || '', grupo: r.grupo, obs: r.obs || '',
     est: r.est.filter(s => s.n.trim()).map(s => ({nombre: s.n.trim(), carrera: s.c || '', items: crits.map(({d, di, c, ci}) => { const o = (d.modo === 'estudiante' ? (r.i[s.u] || {}) : r.g)[K(di, ci)] || {}; return {dim: d.nombre, peso: d.peso, modo: d.modo, crit: c.nombre, nivel: o.nv || '', pts: +o.p || 0, max: c.max}; })}))};
 }
 function guardarRegs() { lsSet('regs', REGS.slice(-300)); }

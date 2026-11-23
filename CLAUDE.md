@@ -40,7 +40,8 @@ Castellano neutro (tú); Rafael no es programador: pasos exactos.
 
 ## Pendientes
 - 23-nov: RP 2.0 falló en la hoja real en `setFrozenColumns(1)` (el título combinado ocupa toda la fila) después de crear RUBRICA y migrar CONFIG, sin tocar REGISTROS/DETALLE → los envíos se rechazaban. RP 2.1: sin inmovilizar y **migración en su lugar** (copia «… (respaldo v1)» + filas pasadas al formato nuevo por nombre de columna, nota /10 calculada). Había 18 filas reales (José David Quiñones Coca, Hito 4, paralelo 102).
-- [ ] Rafael: pegar RP 2.1 → Nueva versión → Rúbrica → Configuración inicial. Luego borrar «RUBRICA (anterior)» si quiere.
+- [x] RP 2.1 implementado y migrado (23-nov): 18 filas reales en REGISTROS nuevo, respaldos «(respaldo v1)». La app manda `version: "v3.0"` (sin la «v», Sheets en español leía «2.3» como fecha; se corrigieron las 18 celdas a «v2.3»). Prueba real OK (RP-9HB2HE1H, borrada con el conector). Enlace vigente `?v=6`.
+- [ ] Rafael (opcional): borrar «RUBRICA (anterior)» y los «(respaldo v1)» cuando ya no los necesite.
 
 ## Comandos
 ```bash
