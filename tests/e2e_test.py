@@ -165,6 +165,7 @@ with sync_playwright() as pw:
     max_srv = 1
     p.goto(URL + '?api=https://servidor.test/exec'); p.wait_for_selector('#sHoja.on')
     assert p.locator('#ind input.nom').count() == 2, 'no borra nombres escritos'
+    p.wait_for_timeout(900)      # deja pasar el aviso «Recuperamos la rúbrica…» que sale al abrir
     p.click('#bEnviar'); p.wait_for_function("document.querySelector('#toast').textContent.includes('máximo es 1')", timeout=5000)
     max_srv = 5
     hitos_srv = hitos[3:]
