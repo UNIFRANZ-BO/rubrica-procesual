@@ -37,6 +37,7 @@ Castellano neutro (tú); Rafael no es programador: pasos exactos.
 
 ## Historial
 - v1.0 (20-nov) flujo por pantallas · v2.0 hoja única «Enviar todo» · v2.3 un hito por evaluación, semestre, sin materia · **v3.0 (23-nov)** rúbrica única visual en Sheets, carreras, nota parcial manual, nota sobre 10, sin paralelo, interfaz épica (script RP 2.0, enlace `?v=5`).
+- **v3.1 (24-nov)** solo interfaz (script igual, mismo enlace): **medidor** semicircular de 5 tramos (Likert: Insuficiente…Excelente) bajo cada criterio grupal, que solo se mueve cuando cambia la nota parcial (`ponMed`/`actualizaMed`); tabla «Apellidos y nombres» · **Asistió** (Sí/No, `s.a === false` = ausente → nota 0, celdas bloqueadas; se envía con nivel «No asistió» y pts 0 y «No asistió: …» al inicio de Observaciones, sin cambiar el script) · Carrera; en celular cada estudiante es una tarjeta.
 
 ## Pendientes
 - 23-nov: RP 2.0 falló en la hoja real en `setFrozenColumns(1)` (el título combinado ocupa toda la fila) después de crear RUBRICA y migrar CONFIG, sin tocar REGISTROS/DETALLE → los envíos se rechazaban. RP 2.1: sin inmovilizar y **migración en su lugar** (copia «… (respaldo v1)» + filas pasadas al formato nuevo por nombre de columna, nota /10 calculada). Había 18 filas reales (José David Quiñones Coca, Hito 4, paralelo 102).

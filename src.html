@@ -136,6 +136,22 @@ box-shadow:0 0 0 1px rgba(255,255,255,.03) inset,0 18px 40px rgba(0,0,0,.35),0 0
 .np.err{border-color:var(--ama)}
 .np::placeholder{color:#59647c}
 .gc.falta{background:rgba(255,207,90,.08);box-shadow:inset 0 0 0 2px rgba(255,207,90,.75)}
+/* medidor de la nota parcial (escala de 5 tramos, tipo Likert) */
+.med{--mc:#5b6680;display:flex;flex-direction:column;align-items:center;margin-top:auto;padding:10px 6px 2px;border-radius:16px;background:radial-gradient(ellipse at 50% 85%,color-mix(in srgb,var(--mc) 20%,transparent),transparent 68%);transition:background .6s}
+.med svg{width:100%;max-width:168px;height:auto;overflow:visible}
+.med .mf{fill:none;stroke:rgba(255,255,255,.08);stroke-width:11;stroke-linecap:round}
+.med .mv{fill:none;stroke:url(#gMed);stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.2,.9,.25,1);filter:drop-shadow(0 0 5px color-mix(in srgb,var(--mc) 75%,transparent))}
+.med .tk{stroke:#0b1124;stroke-width:2.4}
+.med .lk{font:800 7.5px/1 var(--disp);fill:#66728b;text-anchor:middle}
+.med .ag{transform-box:view-box;transform-origin:60px 60px;transform:rotate(-90deg);transition:transform 1.1s cubic-bezier(.2,1.5,.35,1)}
+.med .ag line{stroke:#fff;stroke-width:2.8;stroke-linecap:round}
+.med .ag circle{fill:var(--mc);stroke:#fff;stroke-width:2;transition:fill .6s}
+.med .mt{display:flex;gap:8px;align-items:baseline;justify-content:center;min-height:20px;margin-top:3px;font:800 11.5px/1 var(--disp);letter-spacing:1.2px;text-transform:uppercase;color:var(--mc);transition:color .6s;text-shadow:0 0 12px color-mix(in srgb,var(--mc) 55%,transparent)}
+.med .mt b{font-size:19px;letter-spacing:0;color:#fff;text-shadow:none}
+.med.vacio .mt{color:#66728b;text-transform:none;letter-spacing:0;font:600 12px/1.2 "Segoe UI",sans-serif;text-shadow:none}
+.med.vacio .ag line{stroke:#7b869e}
+.med.sin .mv,.med.sin .ag{transition:none}
+.gnp{margin-top:6px!important}
 /* por estudiante */
 .ind{border-radius:20px;overflow:hidden;background:linear-gradient(180deg,color-mix(in srgb,var(--c1) 14%,rgba(8,12,26,.9)),rgba(8,12,26,.78) 45%);border:1px solid color-mix(in srgb,var(--c1) 45%,transparent);box-shadow:0 18px 40px rgba(0,0,0,.35),0 0 34px color-mix(in srgb,var(--c1) 14%,transparent)}
 .ind .crt{padding:12px 15px 0;font-size:13.5px;color:#cfd8ea}
@@ -151,6 +167,15 @@ table.te td.n{width:36px}
 table.te td.n i{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font:800 12px/1 var(--disp);font-style:normal;background:color-mix(in srgb,var(--c1) 22%,transparent);color:var(--c1);box-shadow:0 0 12px color-mix(in srgb,var(--c1) 30%,transparent)}
 table.te td.nm{min-width:200px}
 table.te td.ca{width:96px}
+table.te td.as{width:84px}
+.asis{min-width:74px;padding:10px 10px;border-radius:999px;border:1px solid rgba(63,224,165,.55);background:rgba(63,224,165,.14);color:var(--ok);font:800 13.5px/1 var(--disp);letter-spacing:.5px;cursor:pointer;transition:all .2s;box-shadow:0 0 14px rgba(63,224,165,.15)}
+.asis::before{content:"●";margin-right:6px;font-size:10px;vertical-align:1px}
+.asis:hover{filter:brightness(1.15)}
+.asis.no{border-color:rgba(255,107,125,.6);background:rgba(255,107,125,.15);color:var(--bad);box-shadow:0 0 14px rgba(255,107,125,.18)}
+table.te tr.ausente td.nm .inp{text-decoration:line-through;opacity:.65}
+table.te tr.ausente .sc{opacity:.3}
+table.te td.fin span.aus{background:rgba(255,107,125,.16);color:var(--bad);box-shadow:none}
+table.te td.fin small.aus{color:var(--bad)}
 table.te select.car{width:92px;font:800 14px/1 var(--disp);text-align:center;padding:10px 6px}
 table.te .sc{width:86px;text-align:center;font:800 16px/1 var(--disp);padding:10px 4px}
 table.te select.sc{width:auto;min-width:130px;text-align:left;font:600 14px/1.2 "Segoe UI",sans-serif}
@@ -178,17 +203,20 @@ table.te tr.falta .inp{border-color:var(--ama);background:rgba(255,207,90,.08)}
   .gch b{min-height:0}
   .gl{flex-direction:row}.gl button{flex:1 1 0;flex-direction:column;justify-content:center;text-align:center;gap:4px;padding:10px 4px;font-size:12.5px;line-height:1.2}
   .gl button.on::before{content:none}
-  .tw{padding:6px 4px 2px}
-  table.te th{padding:2px 2px;font-size:10px;letter-spacing:.3px}
-  table.te th .lg{display:none} table.te th .sm{display:inline}
-  table.te td{padding:0 2px}
-  table.te td.n{width:26px} table.te td.n i{width:22px;height:22px;font-size:11px}
-  table.te td.nm{min-width:0;width:100%}
-  table.te td.nm .inp{padding:10px 8px}
-  table.te td.ca{width:62px} table.te select.car{width:60px;padding:10px 2px;font-size:13px}
-  table.te .sc{width:50px;font-size:15px}
-  table.te select.sc{min-width:96px;font-size:13px}
-  table.te td.fin{width:48px} table.te td.fin span{min-width:42px;padding:7px 3px;font-size:15px}
+  /* en celular cada estudiante es una tarjeta: nombre arriba, controles abajo */
+  .tw{padding:8px 8px 2px;overflow:visible}
+  table.te thead{display:none}
+  table.te,table.te tbody{display:block;width:100%}
+  table.te tr{display:flex;flex-wrap:wrap;align-items:flex-end;gap:9px 7px;padding:10px;margin-bottom:9px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgba(255,255,255,.025)}
+  table.te td{display:block;padding:0;width:auto}
+  table.te td.n{width:auto;align-self:center} table.te td.n i{width:26px;height:26px}
+  table.te td.nm{flex:1 1 calc(100% - 40px);min-width:0}
+  table.te td[data-l]{flex:1 1 60px;min-width:0;text-align:center}
+  table.te td[data-l]::before{content:attr(data-l);display:block;font:800 9.5px/1 var(--disp);letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  table.te .sc,table.te select.car,table.te select.sc,.asis{width:100%;min-width:0}
+  table.te td.fin span{min-width:0;width:100%;padding:9px 4px}
+  table.te td.fin small{margin-top:4px}
+  .asis::before{content:none}
   .firma{justify-content:center}
 }
 /* barra inferior */
@@ -294,19 +322,20 @@ footer span{cursor:pointer;user-select:none}
     <div class="btns"><button class="btn sec" id="bRegsAtras">← Volver a la rúbrica</button></div>
   </div></section>
 
-  <footer>UNIFRANZ · Rúbrica procesual · <span id="ver">v3.0</span></footer>
+  <footer>UNIFRANZ · Rúbrica procesual · <span id="ver">v3.1</span></footer>
 </div>
 
 <div class="barra oculto" id="barra"><div class="in">
   <div class="st"><span id="bSt"></span><div class="prog"><i id="bProg"></i></div></div>
   <button class="btn ok" id="bEnviar">Enviar todo ✓</button>
 </div></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="gMed" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff5d6c"/><stop offset=".45" stop-color="#ffc04d"/><stop offset="1" stop-color="#3fe0a5"/></linearGradient></defs></svg>
 <div id="toast"></div>
 <div class="modal" id="modal"><div class="mc" id="modalC"></div></div>
 
 <script>
 const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbyWnkZy80i45SyPhLlouvxa5mdDHhs8y677VkCuWH7kQm-30S4mQ7U3ZZgJPCeirCxnfA/exec';   // URL de la aplicación web de Apps Script. Vacía = modo de prueba.
-const VERSION = '3.0';
+const VERSION = '3.1';
 /*__MOTOR__*/
 const RUB_DEMO = /*__RUB_DEMO__*/null;
 
@@ -475,14 +504,15 @@ function setCelda(di, ci, u, o) {
   if (EV.rub.dims[di].modo === 'estudiante') { EV.i[u] = EV.i[u] || {}; if (o) EV.i[u][K(di, ci)] = o; else delete EV.i[u][K(di, ci)]; }
   else if (o) EV.g[K(di, ci)] = o; else delete EV.g[K(di, ci)];
 }
-function notaDe(u) { return MOTOR.nota(EV.rub, (di, ci) => valor(di, ci, u)); }
+const ausente = u => { const s = EV.est.find(x => x.u === u); return !!s && s.a === false; };
+function notaDe(u) { return ausente(u) ? MOTOR.nota(EV.rub, () => 0) : MOTOR.nota(EV.rub, (di, ci) => valor(di, ci, u)); }
 function notasDeFila(u) { return EV.rub.dims.some((d, di) => d.modo === 'estudiante' && d.crit.some((c, ci) => valor(di, ci, u) !== null)); }
 function conNombre() { return EV.est.filter(s => s.n.trim()); }
 function faltan() {
   let f = 0, t = 0;
   EV.rub.dims.forEach((d, di) => d.crit.forEach((c, ci) => {
     if (d.modo === 'grupo') { t++; if (valor(di, ci) === null) f++; }
-    else conNombre().forEach(s => { t++; if (valor(di, ci, s.u) === null) f++; });
+    else conNombre().filter(s => s.a !== false).forEach(s => { t++; if (valor(di, ci, s.u) === null) f++; });
   }));
   return {f, t, sinNombre: EV.est.filter(s => !s.n.trim() && notasDeFila(s.u)).length, sinCarrera: conNombre().filter(s => !s.c).length, n: conNombre().length};
 }
@@ -520,12 +550,26 @@ function ctrlFino(di, ci, u) {
   if (pasos.length <= 6) return `<div class="fino" ${at}>Puntaje: ${pasos.map(x => `<button type="button" data-p="${x}" class="${+o.p === x ? 'on' : ''}">${fmt(x)}</button>`).join('')}</div>`;
   return `<div class="fino" ${at}>Puntaje exacto: <select data-fino>${pasos.map(x => `<option value="${x}" ${+o.p === x ? 'selected' : ''}>${fmt(x)}</option>`).join('')}</select></div>`;
 }
+const LIKERT = ['Insuficiente', 'Básico', 'Regular', 'Bueno', 'Excelente'], ZONAS = ['#ff5d6c', '#ff8f5c', '#ffc04d', '#9be36b', '#3fe0a5'];
+const MED_SVG = '<svg viewBox="0 0 120 66" aria-hidden="true"><path class="mf" d="M10 60 A50 50 0 0 1 110 60"/><path class="mv" d="M10 60 A50 50 0 0 1 110 60" stroke-dasharray="157.08" stroke-dashoffset="157.08"/><line class="tk" x1="25.2" y1="34.7" x2="13.9" y2="26.5"/><line class="tk" x1="46.7" y1="19.1" x2="42.4" y2="5.8"/><line class="tk" x1="73.3" y1="19.1" x2="77.6" y2="5.8"/><line class="tk" x1="94.8" y1="34.7" x2="106.1" y2="26.5"/><text class="lk" x="28.6" y="52.4">1</text><text class="lk" x="40.6" y="35.9">2</text><text class="lk" x="60.0" y="29.6">3</text><text class="lk" x="79.4" y="35.9">4</text><text class="lk" x="91.4" y="52.4">5</text><g class="ag"><line x1="60" y1="60" x2="60" y2="19"/><circle cx="60" cy="60" r="5.5"/></g></svg>';
+function medHTML(k) { return `<div class="med vacio" data-med="${k}" role="img" aria-label="Medidor de la nota parcial">${MED_SVG}<div class="mt"><span>Esperando la nota parcial</span></div></div>`; }
+function ponMed(m, f) {            // f = nota parcial / máximo (null = sin nota): solo cambia cuando cambia la nota parcial
+  if (!m) return;
+  const vacio = f === null || f === undefined || f === '' || isNaN(f); f = vacio ? 0 : Math.max(0, Math.min(1, +f));
+  const z = Math.min(4, Math.floor(f * 5 + 1e-9));
+  m.classList.toggle('vacio', vacio); m.dataset.pc = vacio ? '' : f;
+  m.style.setProperty('--mc', vacio ? '#5b6680' : ZONAS[z]);
+  $('.mv', m).style.strokeDashoffset = (157.08 * (1 - f)).toFixed(2);
+  $('.ag', m).style.transform = `rotate(${-90 + 180 * f}deg)`;
+  $('.mt', m).innerHTML = vacio ? '<span>Esperando la nota parcial</span>' : `<b>${Math.round(f * 100)}%</b><span>${LIKERT[z]}</span>`;
+}
+function actualizaMed(di, ci) { const v = valor(di, ci); ponMed($(`[data-med="${K(di, ci)}"]`), v === null ? null : v / EV.rub.dims[di].crit[ci].max); }
 function gcHTML(di, ci) {
   const c = EV.rub.dims[di].crit[ci], o = celda(di, ci) || {}, v = valor(di, ci), at = `data-di="${di}" data-ci="${ci}"`;
   const ctrl = c.nv.length ? `<div class="gl">${c.nv.map((n, k) => `<button type="button" ${at} data-k="${k}" class="${o.nv === n.n ? 'on' : ''}"><span>${esc(n.n)}</span><b>${rangoTxt(n)}</b></button>`).join('')}</div>${ctrlFino(di, ci)}`
     : `<p class="gdesc">Escribe la nota directamente abajo (0 a ${fmt(c.max)}).</p>`;
   return `<div class="gc ${EV.intento && v === null ? 'falta' : ''}" id="gc_${K(di, ci)}"><div class="gch"><span>Criterio ${ci + 1}</span><b>${esc(c.nombre)}</b></div>
-    ${c.desc ? `<p class="gdesc">${esc(c.desc)}</p>` : ''}${ctrl}<label class="gnp"><span>Nota parcial</span><span><input class="np" ${at} inputmode="decimal" value="${v === null ? '' : fmt(v)}" placeholder="…" aria-label="Nota parcial de ${esc(c.nombre)}" title="Puedes escribir la nota a mano"> / ${fmt(c.max)}</span></label></div>`;
+    ${c.desc ? `<p class="gdesc">${esc(c.desc)}</p>` : ''}${ctrl}${medHTML(K(di, ci))}<label class="gnp"><span>Nota parcial</span><span><input class="np" ${at} inputmode="decimal" value="${v === null ? '' : fmt(v)}" placeholder="…" aria-label="Nota parcial de ${esc(c.nombre)}" title="Puedes escribir la nota a mano"> / ${fmt(c.max)}</span></label></div>`;
 }
 function pintarGrupal() {
   const gd = EV.rub.dims.map((d, di) => ({d, di})).filter(x => x.d.modo === 'grupo'), n = gd.reduce((a, x) => a + x.d.crit.length, 0), ancho = n <= 6;
@@ -534,9 +578,11 @@ function pintarGrupal() {
   $('#gg').innerHTML = gd.map(({d, di}) => `<div class="gdim" style="${pal(di)};--k:${d.crit.length};${ancho ? '' : 'grid-column:1/-1'}">
     <div class="gdh"><span>Dimensión ${esc(d.nombre)} ${fmt(d.peso)}% <span class="tg">· por grupo</span></span><span class="dp" data-dp="${di}"></span></div>
     <div class="gcs">${d.crit.map((c, ci) => gcHTML(di, ci)).join('')}</div></div>`).join('');
+  const todos = () => gd.forEach(({d, di}) => d.crit.forEach((c, ci) => actualizaMed(di, ci)));
+  if (QUIETO) todos(); else requestAnimationFrame(() => requestAnimationFrame(todos));      // las agujas suben al abrir
 }
 function celdaEst(di, ci, u) {
-  const c = EV.rub.dims[di].crit[ci], o = celda(di, ci, u) || {}, at = `data-di="${di}" data-ci="${ci}" data-u="${u}"`;
+  const c = EV.rub.dims[di].crit[ci], o = celda(di, ci, u) || {}, at = `data-di="${di}" data-ci="${ci}" data-u="${u}"` + (ausente(u) ? ' disabled' : '');
   if (!c.nv.length) return `<input class="inp sc" ${at} inputmode="decimal" value="${o.p === undefined || o.p === '' ? '' : fmt(o.p)}" placeholder="—" aria-label="${esc(c.nombre)}">`;
   const ops = []; c.nv.forEach((n, k) => { for (let x = n.a; x <= n.b + 1e-9; x += 1) ops.push([k + '|' + x, n.n + (n.a === n.b ? '' : ' · ' + fmt(x)) + ' (' + fmt(x) + ')', o.nv === n.n && +o.p === x]); });
   return `<select class="inp sc" ${at}><option value="">—</option>${ops.map(([v, t, s]) => `<option value="${v}" ${s ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>`;
@@ -549,9 +595,9 @@ function pintarEstudiantes() {
   const crit = cols.map(x => `<div class="crt"><b>${cols.length > 1 ? esc(x.d.nombre) + ' · C' + (x.ci + 1) + ':' : 'Criterio:'}</b> ${esc(x.c.nombre)}${x.c.desc ? ' — ' + esc(x.c.desc) : ''} <span style="color:var(--mut)">(${x.c.nv.length ? 'elige el nivel' : 'de 0 a ' + fmt(x.c.max)})</span></div>`).join('');
   const prev = previos();
   $('#ind').innerHTML = `<div class="ind" style="${pal(di0)}"><div class="gdh"><span>${tit}</span></div>${crit}
-    <div class="tw"><table class="te"><thead><tr><th>N.º</th><th class="izq">Nombre del estudiante</th><th>Carrera</th>${cols.map(x => `<th title="${esc(x.c.nombre)}"><span class="lg">${esc(x.d.nombre)}${cols.length > 1 ? ' C' + (x.ci + 1) : ''}</span><span class="sm">${cols.length > 1 ? 'C' + (x.ci + 1) : 'Nota'}</span><br><small>/ ${fmt(x.c.max)}</small></th>`).join('')}<th><span class="lg">Nota final</span><span class="sm">Final</span><br><small>/ ${fmt(EV.rub.total || 100)}</small></th></tr></thead>
-    <tbody>${EV.est.map((s, i) => `<tr data-u="${s.u}"><td class="n"><i>${i + 1}</i></td><td class="nm"><input class="inp nom" data-u="${s.u}" list="dlNombres" value="${esc(s.n)}" placeholder="Estudiante ${i + 1}" autocomplete="off" spellcheck="false" aria-label="Estudiante ${i + 1}"></td><td class="ca"><select class="inp car" data-u="${s.u}" aria-label="Carrera del estudiante ${i + 1}"><option value="">—</option>${carrerasEst().map(c => `<option ${c === s.c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></td>${cols.map(x => `<td>${celdaEst(x.di, x.ci, s.u)}</td>`).join('')}<td class="fin" data-nf="${s.u}"></td></tr>`).join('')}</tbody></table></div>
-    <div class="estpie"><span>Consejo: pega una lista de nombres (uno por línea, desde Excel o el SIS) en la primera fila y se reparten solos.</span>${prev.length ? '<button type="button" class="pb" id="bPrev">Usar integrantes de un grupo anterior</button>' : ''}</div></div>`;
+    <div class="tw"><table class="te"><thead><tr><th>N.º</th><th class="izq">Apellidos y nombres</th><th>Asistió</th><th>Carrera</th>${cols.map(x => `<th title="${esc(x.c.nombre)}"><span class="lg">${esc(x.d.nombre)}${cols.length > 1 ? ' C' + (x.ci + 1) : ''}</span><span class="sm">${cols.length > 1 ? 'C' + (x.ci + 1) : 'Nota'}</span><br><small>/ ${fmt(x.c.max)}</small></th>`).join('')}<th><span class="lg">Nota final</span><span class="sm">Final</span><br><small>/ ${fmt(EV.rub.total || 100)}</small></th></tr></thead>
+    <tbody>${EV.est.map((s, i) => `<tr data-u="${s.u}" class="${s.a === false ? 'ausente' : ''}"><td class="n"><i>${i + 1}</i></td><td class="nm"><input class="inp nom" data-u="${s.u}" list="dlNombres" value="${esc(s.n)}" placeholder="Apellidos y nombres" autocomplete="off" spellcheck="false" aria-label="Apellidos y nombres del estudiante ${i + 1}"></td><td class="as" data-l="Asistió"><button type="button" class="asis ${s.a === false ? 'no' : ''}" data-u="${s.u}" aria-pressed="${s.a !== false}" title="Toca para cambiar">${s.a === false ? 'No' : 'Sí'}</button></td><td class="ca" data-l="Carrera"><select class="inp car" data-u="${s.u}" aria-label="Carrera del estudiante ${i + 1}"><option value="">—</option>${carrerasEst().map(c => `<option ${c === s.c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></td>${cols.map(x => `<td data-l="${esc(cols.length > 1 ? 'C' + (x.ci + 1) : 'Nota')} /${fmt(x.c.max)}">${celdaEst(x.di, x.ci, s.u)}</td>`).join('')}<td class="fin" data-nf="${s.u}" data-l="Final"></td></tr>`).join('')}</tbody></table></div>
+    <div class="estpie"><span>Consejo: pega una lista de apellidos y nombres (uno por línea, desde Excel o el SIS) en la primera fila y se reparten solos. Si alguien no se presentó, toca «Sí» para cambiarlo a «No»: su nota queda en 0.</span>${prev.length ? '<button type="button" class="pb" id="bPrev">Usar integrantes de un grupo anterior</button>' : ''}</div></div>`;
   $('#dlNombres').innerHTML = conocidos().map(n => `<option value="${esc(n)}">`).join('');
   const bp = $('#bPrev'); if (bp) bp.onclick = elegirPrevio;
 }
@@ -560,6 +606,7 @@ function refrescar() {
   EV.est.forEach(s => {
     const e = $(`[data-nf="${s.u}"]`), tr = e && e.closest('tr'); if (!e) return;
     const nom = s.n.trim(), n = notaDe(s.u);
+    if (s.a === false) { e.innerHTML = nom ? '<span class="aus">0</span><small class="aus">No asistió</small>' : ''; tr.classList.toggle('falta', !!EV.intento && !!nom && !s.c); return; }
     e.innerHTML = !nom ? '' : `<span class="${n.completo ? 'lista' : ''}">${n.completo ? fmt(n.total) : '…'}</span>`;
     tr.classList.toggle('falta', !!EV.intento && ((nom && (!n.completo || !s.c)) || (!nom && notasDeFila(s.u))));
     if (nom && n.completo) e.innerHTML += `<small>${sobre10(n.total, EV.rub.total || 100)}/10</small>`;
@@ -572,7 +619,14 @@ function refrescar() {
   $('#bEnviar').disabled = RUB.abierta === false;
   lsSet('ev', EV);
 }
-function repintarGC(di, ci) { const el = $('#gc_' + K(di, ci)); if (!el) return; const t = document.createElement('div'); t.innerHTML = gcHTML(di, ci); el.replaceWith(t.firstElementChild); refrescar(); }
+function repintarGC(di, ci) {
+  const el = $('#gc_' + K(di, ci)); if (!el) return;
+  const antes = ($('.med', el) || {dataset: {}}).dataset.pc, t = document.createElement('div'); t.innerHTML = gcHTML(di, ci);
+  const nuevo = t.firstElementChild; el.replaceWith(nuevo);
+  const m = $('.med', nuevo);       // la aguja parte de donde estaba y se mueve a la nota nueva
+  if (m && antes !== undefined && antes !== '') { m.classList.add('sin'); ponMed(m, +antes); m.getBoundingClientRect(); m.classList.remove('sin'); }
+  actualizaMed(di, ci); refrescar();
+}
 
 /* eventos de la hoja (delegados, una sola vez) */
 const hoja = $('#sHoja');
@@ -581,6 +635,13 @@ hoja.addEventListener('click', e => {
   if (b.closest('.gl')) {
     const di = +b.dataset.di, ci = +b.dataset.ci, n = EV.rub.dims[di].crit[ci].nv[+b.dataset.k], o = celda(di, ci);
     setCelda(di, ci, null, o && o.nv === n.n ? null : {nv: n.n, p: n.b}); return repintarGC(di, ci);
+  }
+  if (b.classList.contains('asis')) {
+    const s = EV.est.find(x => x.u === b.dataset.u); if (!s) return;
+    s.a = s.a === false ? true : false; pintarEstudiantes(); refrescar();
+    if (s.a === false && s.n.trim()) toast(`${s.n.trim()}: no asistió (nota 0).`);
+    const nb = $(`#ind .asis[data-u="${s.u}"]`); if (nb) nb.focus({preventScroll: true});
+    return;
   }
   if (b.dataset.p !== undefined && b.closest('.fino')) { const f = b.closest('.fino'), di = +f.dataset.di, ci = +f.dataset.ci; setCelda(di, ci, null, {nv: celda(di, ci).nv, p: +b.dataset.p}); return repintarGC(di, ci); }
 });
@@ -606,6 +667,7 @@ hoja.addEventListener('input', e => {
     t.classList.toggle('err', s !== '' && (isNaN(v) || v < 0 || v > c.max));
     const o = celda(di, ci); $$('.gl button', gc).forEach(b => b.classList.toggle('on', !!o && o.nv === c.nv[+b.dataset.k].n));
     if (o) gc.classList.remove('falta');
+    actualizaMed(di, ci);
     return refrescar();
   }
   if (t.matches('input.num') || t.matches('input.sc')) {
@@ -636,7 +698,7 @@ hoja.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.matches('input.np')) { e.preventDefault(); e.target.blur(); return; }
   if (e.key !== 'Enter' || !e.target.matches('input.nom,input.sc,select.sc,select.car')) return;
   e.preventDefault();
-  const campos = $$('#ind input.nom, #ind select.car, #ind .sc'), k = campos.indexOf(e.target);
+  const campos = $$('#ind input.nom, #ind select.car, #ind .sc:not([disabled])'), k = campos.indexOf(e.target);
   if (campos[k + 1]) campos[k + 1].focus();
 });
 function avisarDuplicado(t) {
@@ -687,8 +749,12 @@ async function elegirPrevio() {
 /* ───────── enviar todo ───────── */
 function payload(r) {
   const crits = []; r.rub.dims.forEach((d, di) => d.crit.forEach((c, ci) => crits.push({d, di, c, ci})));
-  return {id: r.id, rev: String(r.rev), version: 'v' + VERSION, clave: PERFIL.clave || '', docente: r.docente, hito: r.hito, semestre: r.semestre || '', carrera: r.carrera || '', grupo: r.grupo, obs: r.obs || '',
-    est: r.est.filter(s => s.n.trim()).map(s => ({nombre: s.n.trim(), carrera: s.c || '', items: crits.map(({d, di, c, ci}) => { const o = (d.modo === 'estudiante' ? (r.i[s.u] || {}) : r.g)[K(di, ci)] || {}; return {dim: d.nombre, peso: d.peso, modo: d.modo, crit: c.nombre, nivel: o.nv || '', pts: +o.p || 0, max: c.max}; })}))};
+  const aus = r.est.filter(s => s.n.trim() && s.a === false).map(s => s.n.trim());
+  return {id: r.id, rev: String(r.rev), version: 'v' + VERSION, clave: PERFIL.clave || '', docente: r.docente, hito: r.hito, semestre: r.semestre || '', carrera: r.carrera || '', grupo: r.grupo,
+    obs: (aus.length ? 'No asistió: ' + aus.join(', ') + '.' + (r.obs ? ' ' : '') : '') + (r.obs || ''),
+    est: r.est.filter(s => s.n.trim()).map(s => ({nombre: s.n.trim(), carrera: s.c || '', items: crits.map(({d, di, c, ci}) => {
+      if (s.a === false) return {dim: d.nombre, peso: d.peso, modo: d.modo, crit: c.nombre, nivel: 'No asistió', pts: 0, max: c.max};
+      const o = (d.modo === 'estudiante' ? (r.i[s.u] || {}) : r.g)[K(di, ci)] || {}; return {dim: d.nombre, peso: d.peso, modo: d.modo, crit: c.nombre, nivel: o.nv || '', pts: +o.p || 0, max: c.max}; })}))};
 }
 function guardarRegs() { lsSet('regs', REGS.slice(-300)); }
 function irA(el) { if (!el) return; el.scrollIntoView({behavior: QUIETO ? 'auto' : 'smooth', block: 'center'}); }
@@ -706,7 +772,7 @@ $('#bEnviar').onclick = async () => {
   if (x.sinNombre) { irA($('#ind tr.falta')); return toast('Hay una nota sin el nombre del estudiante.', true); }
   if (x.f) { irA($('.gc.falta') || $('#ind tr.falta')); return toast(`Faltan ${x.f} calificaciones (marcadas en amarillo).`, true); }
   if (x.sinCarrera) { irA($('#ind tr.falta')); return toast('Elige la carrera de cada estudiante (ADM o ICO).', true); }
-  const dims = EV.rub.dims, filas = conNombre().map(s => { const n = notaDe(s.u); return `<tr><td>${esc(s.n)} <small class="mut">${esc(s.c)}</small></td>${n.dims.map(d => `<td>${fmt(d.nota)}</td>`).join('')}<td class="fin">${fmt(n.total)}</td><td class="fin">${sobre10(n.total, EV.rub.total || 100)}</td></tr>`; }).join('');
+  const dims = EV.rub.dims, filas = conNombre().map(s => { const n = notaDe(s.u); return `<tr><td>${esc(s.n)} <small class="mut">${esc(s.c)}${s.a === false ? ' · <span style="color:var(--bad)">no asistió</span>' : ''}</small></td>${n.dims.map(d => `<td>${fmt(d.nota)}</td>`).join('')}<td class="fin">${fmt(n.total)}</td><td class="fin">${sobre10(n.total, EV.rub.total || 100)}</td></tr>`; }).join('');
   const ok = await modal(`<p class="mut small" style="margin:0">${esc(EV.hito)} · ${esc(semTxt(PERFIL.semestre))} · ${esc(PERFIL.carrera)}</p><h2>${esc(EV.grupo || 'Grupo sin nombre')}</h2>
     <table class="tabla"><tr><th>Estudiante</th>${dims.map(d => `<th>${esc(d.nombre.slice(0, 5))}.<br>/${fmt(d.peso)}</th>`).join('')}<th>Final<br>/${fmt(EV.rub.total || 100)}</th><th>Nota<br>/10</th></tr>${filas}</table>
     <p class="mut small">${API_OK ? (EV.rev ? 'Reemplaza la versión anterior en la hoja.' : 'Se envía todo a la hoja en un solo paso.') : 'Modo de prueba: queda solo en este dispositivo.'}</p>`,
@@ -756,7 +822,7 @@ async function verReg(id) {
   if (r.estado === 'pen' || r.estado === 'err') ops.push({t: 'Reintentar envío', v: 're'});
   ops.push({t: 'Cerrar', v: '', sec: 1});
   const v = await modal(`<p class="mut small" style="margin:0">${esc(r.hito)} · ${esc(semTxt(r.semestre || ''))} · ${esc(r.carrera || '')}</p><h2>${esc(r.grupo || 'Grupo sin nombre')}</h2>
-    <table class="tabla"><tr><th>Estudiante</th><th>Nota</th><th>/10</th></tr>${r.est.map((s, i) => `<tr><td>${esc(s.n)} <small class="mut">${esc(s.c || '')}</small></td><td class="fin">${fmt(r.notas ? r.notas[i] : 0)}</td><td class="fin">${sobre10(r.notas ? r.notas[i] : 0, r.rub.total || 100)}</td></tr>`).join('')}</table><p class="mut small">ID ${r.id}</p>`, ops);
+    <table class="tabla"><tr><th>Estudiante</th><th>Nota</th><th>/10</th></tr>${r.est.map((s, i) => `<tr><td>${esc(s.n)} <small class="mut">${esc(s.c || '')}${s.a === false ? ' · no asistió' : ''}</small></td><td class="fin">${fmt(r.notas ? r.notas[i] : 0)}</td><td class="fin">${sobre10(r.notas ? r.notas[i] : 0, r.rub.total || 100)}</td></tr>`).join('')}</table><p class="mut small">ID ${r.id}</p>`, ops);
   if (v === 'ed') {
     if (RUB.abierta === false) return toast(RUB.mensaje || 'El registro está cerrado.', true);
     if (EV && tieneDatos() && !EV.rev) { const s = await modal('<h2>¿Dejar la rúbrica que estás llenando?</h2><p class="mut">Lo que marcaste y aún no enviaste se pierde.</p>', [{t: 'Sí, corregir la otra', v: 1}, {t: 'Cancelar', v: 0, sec: 1}]); if (!s) return; }

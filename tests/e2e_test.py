@@ -1,4 +1,4 @@
-"""Recorrido completo de la app v3 (rúbrica única, carreras, nota parcial a mano) con Playwright.  Uso: python tests/e2e_test.py
+"""Recorrido completo de la app v3.1 (rúbrica única, carreras, nota parcial a mano, medidor, asistencia) con Playwright.  Uso: python tests/e2e_test.py
 1) modo de prueba (?api=prueba) a 390 px  2) servidor simulado (?api=https://servidor.test/exec) a 1366 px: JSONP, POST, corrección."""
 import json, pathlib, subprocess, shutil, sys, urllib.parse
 from playwright.sync_api import sync_playwright
@@ -39,6 +39,9 @@ with sync_playwright() as pw:
     assert [o.inner_text() for o in p.locator('#iCarrera option').all()] == ['Elige…', 'ADM', 'ICO', 'ADM/ICO']
     assert [o.inner_text() for o in p.locator('#ind select.car').first.locator('option').all()] == ['—', 'ADM', 'ICO']
     assert p.locator('#iParalelo').count() == 0, 'sin paralelo'
+    assert p.get_attribute('#ind input.nom', 'placeholder') == 'Apellidos y nombres' and p.locator('#ind .asis').first.inner_text() == 'Sí'
+    assert p.locator('.gc .med.vacio').count() == 5, 'medidores en espera'
+    med = lambda i: p.locator('.gc').nth(i).locator('.med')
     p.screenshot(path=str(out / '01_hoja_vacia_movil.png'), full_page=True)
     p.click('#bEnviar'); p.wait_for_timeout(300)
     assert p.locator('#modal.on').count() == 0, 'incompleta no abre el resumen'
@@ -51,10 +54,14 @@ with sync_playwright() as pw:
     assert noms == ['Juan Pérez Quispe', 'María de la Cruz', 'Lucía Rojas', ''], noms
     grupal(p)
     assert p.locator('[data-dp="0"]').inner_text() == '17 / 30'
+    assert med(0).get_attribute('data-pc') == '1' and med(0).locator('.mt').inner_text().replace('\n', ' ') == '100% EXCELENTE', med(0).locator('.mt').inner_text()
+    assert med(4).get_attribute('data-pc') == '0.5' and 'REGULAR' in med(4).locator('.mt').inner_text()
+    assert med(2).get_attribute('data-pc') == '0.2' and 'BÁSICO' in med(2).locator('.mt').inner_text()
     # nota parcial escrita a mano
     np = p.locator('.gc input.np')
     np.nth(4).fill('15'); np.nth(4).press('Enter')
     assert p.locator('.gc').nth(4).locator('.gl button.on').count() == 0, '15 no es ningún nivel'
+    assert med(4).get_attribute('data-pc') == '0.75' and 'BUENO' in med(4).locator('.mt').inner_text(), 'el medidor sigue a la nota parcial'
     np.nth(0).fill('5'); np.nth(0).press('Enter')
     assert p.locator('.gc').nth(0).locator('.gl button.on').inner_text().startswith('Cumple parcialmente'), 'marca el nivel que corresponde'
     assert p.locator('[data-dp="0"]').inner_text() == '12 / 30' and p.locator('[data-dp="1"]').inner_text() == '25 / 30'
@@ -67,7 +74,9 @@ with sync_playwright() as pw:
     assert 'completa' in p.inner_text('#bSt') and p.locator('#bEnviar.listo').count() == 1
     assert p.locator('[data-nf] span.lista').nth(0).inner_text() == '72' and p.locator('[data-nf] small').nth(0).inner_text() == '7/10'
     assert p.locator('[data-nf] small').nth(2).inner_text() == '8/10', '77 → 8'
+    p.wait_for_timeout(1300)
     p.screenshot(path=str(out / '02_hoja_llena_movil.png'), full_page=True)
+    assert p.evaluate('document.documentElement.scrollWidth') <= 390, 'sin desborde en la hoja'
     p.click('#bEnviar'); p.wait_for_selector('#modal.on')
     t = p.inner_text('#modalC').replace(' ', ''); print(t)
     assert 'JuanPérezQuispeADM\t12\t25\t35\t72\t7' in t, t
@@ -128,7 +137,12 @@ with sync_playwright() as pw:
     nom = p.locator('#ind input.nom')
     for i, n in enumerate(['Ana Uno', 'Beto Dos', 'Ceci Tres']): nom.nth(i).fill(n); nom.nth(i).press('Tab')
     grupal(p)
-    for i, v in enumerate([30, 20, 10]): p.locator('#ind input.sc').nth(i).fill(str(v))
+    for i, v in enumerate([30, 20]): p.locator('#ind input.sc').nth(i).fill(str(v))
+    assert 'Faltan 1' in p.inner_text('#bSt')
+    p.locator('#ind .asis').nth(2).click()
+    assert p.locator('#ind .asis').nth(2).inner_text() == 'No' and p.locator('#ind input.sc').nth(2).is_disabled()
+    assert 'completa' in p.inner_text('#bSt') and p.locator('[data-nf] span.aus').inner_text() == '0'
+    p.wait_for_timeout(1300)
     p.screenshot(path=str(out / '05_hoja_escritorio.png'), full_page=True)
     p.screenshot(path=str(out / '06_hoja_escritorio_arriba.png'))
     p.click('#bEnviar'); p.locator('#modalC button', has_text='Enviar todo').click(); p.wait_for_selector('#sFin.on')
@@ -136,15 +150,16 @@ with sync_playwright() as pw:
     d = recibidos[0]
     assert len(recibidos) == 1 and [e['nombre'] for e in d['est']] == ['Ana Uno', 'Beto Dos', 'Ceci Tres'] and d['hito'] == H5 and d['semestre'] == '3' and d['carrera'] == 'ICO'
     assert 'paralelo' not in d and all(e['carrera'] == 'ICO' for e in d['est'])
+    assert all(it['nivel'] == 'No asistió' and it['pts'] == 0 for it in d['est'][2]['items']) and d['obs'].startswith('No asistió: Ceci Tres.')
     assert d['est'][0]['items'][5] == {'dim': 'Actitudinal', 'peso': 40, 'modo': 'estudiante', 'crit': h0['dims'][2]['crit'][0]['nombre'], 'nivel': '', 'pts': 30, 'max': 40}
     assert d['est'][0]['items'][2]['nivel'] == 'No cumple' and d['est'][0]['items'][2]['pts'] == 2
     # corrección: mismo id, revisión nueva
     p.click('#bFinRegs'); p.locator('.reg').first.click(); p.locator('#modalC button', has_text='Corregir').click()
     p.wait_for_selector('#sHoja.on'); assert 'corrigiendo' in p.inner_text('#avisos').lower() and p.input_value('#iCarrera') == 'ICO'
-    p.locator('#ind input.sc').nth(2).fill('12')
+    p.locator('#ind .asis').nth(2).click(); p.locator('#ind input.sc').nth(2).fill('12')
     p.click('#bEnviar'); p.locator('#modalC button', has_text='Enviar todo').click(); p.wait_for_selector('#sFin.on')
     assert len(recibidos) == 2 and recibidos[1]['id'] == d['id'] and recibidos[1]['rev'] != d['rev']
-    assert recibidos[1]['est'][2]['items'][5]['pts'] == 12
+    assert recibidos[1]['est'][2]['items'][5]['pts'] == 12 and recibidos[1]['obs'] == ''
     regs = p.evaluate("JSON.parse(localStorage.getItem('rubp1_regs'))"); assert len(regs) == 1 and regs[0]['estado'] == 'env'
     # con un solo hito habilitado no aparece el selector
     hitos_srv = hitos[3:]
