@@ -17,14 +17,9 @@ errores = []
 
 
 def grupal(p):
-    """Conceptual: Cumple / Cumple parcialmente / No cumple → 2 ; Procedimental: Cumple / Cumple parcialmente"""
-    gc = p.locator('.gc')
-    gc.nth(0).locator('.gl button').nth(0).click()
-    gc.nth(1).locator('.gl button').nth(1).click()
-    gc.nth(2).locator('.gl button').nth(2).click()
-    p.locator('.gc').nth(2).locator('.fino button', has_text='2').click()
-    p.locator('.gc').nth(3).locator('.gl button').nth(0).click()
-    p.locator('.gc').nth(4).locator('.gl button').nth(1).click()
+    """Notas parciales escritas a mano: Conceptual 10 · 5 · 2 ; Procedimental 10 · 10"""
+    for i, v in enumerate([10, 5, 2, 10, 10]):
+        np = p.locator('.gc input.np').nth(i); np.fill(str(v)); np.press('Enter')
 
 
 with sync_playwright() as pw:
@@ -60,10 +55,8 @@ with sync_playwright() as pw:
     # nota parcial escrita a mano
     np = p.locator('.gc input.np')
     np.nth(4).fill('15'); np.nth(4).press('Enter')
-    assert p.locator('.gc').nth(4).locator('.gl button.on').count() == 0, '15 no es ningún nivel'
     assert med(4).get_attribute('data-pc') == '0.75' and 'BUENO' in med(4).locator('.mt').inner_text(), 'el medidor sigue a la nota parcial'
     np.nth(0).fill('5'); np.nth(0).press('Enter')
-    assert p.locator('.gc').nth(0).locator('.gl button.on').inner_text().startswith('Cumple parcialmente'), 'marca el nivel que corresponde'
     assert p.locator('[data-dp="0"]').inner_text() == '12 / 30' and p.locator('[data-dp="1"]').inner_text() == '25 / 30'
     sc = p.locator('#ind input.sc')
     for i, v in enumerate([35, 28]): sc.nth(i).fill(str(v))
@@ -74,19 +67,21 @@ with sync_playwright() as pw:
     assert 'completa' in p.inner_text('#bSt') and p.locator('#bEnviar.listo').count() == 1
     assert p.locator('[data-nf] span.lista').nth(0).inner_text() == '72' and p.locator('[data-nf] small').nth(0).inner_text() == '7/10'
     assert p.locator('[data-nf] small').nth(2).inner_text() == '8/10', '77 → 8'
+    assert [p.locator('[data-nl]').nth(i).inner_text().strip()[1:].strip().upper() for i in range(3)] == ['BÁSICO', 'BÁSICO', 'AUTÓNOMO'], 'niveles de logro'
     p.wait_for_timeout(1300)
     p.screenshot(path=str(out / '02_hoja_llena_movil.png'), full_page=True)
     assert p.evaluate('document.documentElement.scrollWidth') <= 390, 'sin desborde en la hoja'
     p.click('#bEnviar'); p.wait_for_selector('#modal.on')
     t = p.inner_text('#modalC').replace(' ', ''); print(t)
-    assert 'JuanPérezQuispeADM\t12\t25\t35\t72\t7' in t, t
+    assert 'JuanPérezQuispeADM\t12\t25\t35\t72\t7' in t and t.upper().count('BÁSICO') == 2 and 'AUTÓNOMO' in t.upper(), t
     p.screenshot(path=str(out / '03_resumen_movil.png'))
     p.locator('#modalC button', has_text='Enviar todo').click(); p.wait_for_selector('#sFin.on')
     assert 'modo de prueba' in p.inner_text('#fTit')
     regs = p.evaluate("JSON.parse(localStorage.getItem('rubp1_regs'))")
     assert len(regs) == 1 and regs[0]['estado'] == 'pru' and regs[0]['carrera'] == 'ADM/ICO' and regs[0]['semestre'] == '2' and [s['c'] for s in regs[0]['est']] == ['ADM', 'ICO', 'ICO']
     p.click('#bOtro'); p.wait_for_selector('#sHoja.on')
-    assert p.locator('.gl button.on').count() == 0 and p.locator('#ind input.nom').first.input_value() == '', 'hoja limpia'
+    assert p.locator('.gl button').count() == 0, 'sin botones de nivel'
+    assert all(n.input_value() == '' for n in p.locator('.gc input.np').all()) and p.locator('#ind input.nom').first.input_value() == '', 'hoja limpia'
     assert p.input_value('#iDocente') == 'Rafael Aramayo' and p.input_value('#iCarrera') == 'ADM/ICO', 'recuerda al docente y la carrera'
     p.select_option('#iCarrera', 'ICO')
     assert all(s.input_value() == 'ICO' for s in p.locator('#ind select.car').all()), 'grupo de una carrera → todos ICO'
@@ -96,10 +91,10 @@ with sync_playwright() as pw:
     assert p.locator('#ind input.nom').nth(2).input_value() == 'Lucía Rojas' and p.locator('#ind select.car').nth(2).input_value() == 'ICO', 'repite integrantes con su carrera'
     nom4 = p.locator('#ind input.nom').nth(3); nom4.fill('maría de la cruz'); nom4.press('Tab')
     # cambiar de hito con notas marcadas pide confirmación y conserva los nombres
-    p.locator('.gc').nth(0).locator('.gl button').nth(0).click()
+    np0 = p.locator('.gc input.np').first; np0.fill('10'); np0.press('Enter')
     p.select_option('#selHito', 'Hito 2'); p.wait_for_selector('#modal.on')
     p.locator('#modalC button', has_text='Cambiar de hito').click()
-    assert p.text_content('#hTit') == 'Hito 2' and p.locator('.gl button.on').count() == 0
+    assert p.text_content('#hTit') == 'Hito 2' and p.locator('.gc input.np').first.input_value() == ''
     assert p.locator('#ind input.nom').first.input_value() == 'Juan Pérez Quispe' and p.locator('.gc').count() == 5, 'misma rúbrica en otro hito'
     # borrador: al recargar sigue ahí
     p.goto(URL + '?api=prueba'); p.wait_for_selector('#sHoja.on')
