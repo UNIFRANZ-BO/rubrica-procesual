@@ -10,7 +10,7 @@
  *
  * @OnlyCurrentDoc
  */
-const VERSION = 'RP 2.0';
+const VERSION = 'RP 2.1';
 const GRIS = '#3a3a3a';
 const H = {CFG: 'CONFIG', RUB: 'RUBRICA', REG: 'REGISTROS', DET: 'DETALLE', PAP: 'PAPELERA', BIT: 'BITACORA'};
 const CAB_REG = ['Fecha y hora', 'ID registro', 'Docente', 'Hito', 'Semestre', 'Carrera del grupo', 'Grupo / proyecto', 'N.º', 'Estudiante', 'Carrera',
@@ -220,7 +220,6 @@ function crearRubrica_(sh, rub, titulo) {
   sh.getRange(F0 + 6, 1).setNote('Desde aquí hacia abajo, un renglón por nivel (puedes cambiar el nombre o agregar niveles). En cada criterio: número (10), rango (0-3) o vacío.');
   sh.setColumnWidth(1, 170); for (let i = 2; i <= n; i++) sh.setColumnWidth(i, 175);
   sh.setRowHeight(F0 + 3, 62);
-  sh.setFrozenColumns(1);
 }
 
 /* ═════════════════════════ CONFIGURACIÓN INICIAL (también migra versiones anteriores) ═════════════════════════ */
@@ -267,16 +266,23 @@ function configuracionInicial() {
   if (sh.getLastRow() < 2) crearRubrica_(sh, SEED, config_().titulo);
   // REGISTROS, DETALLE, PAPELERA (si el encabezado cambió: con datos se guarda la versión anterior aparte)
   [[H.REG, CAB_REG], [H.DET, CAB_DET], [H.PAP, CAB_REG.concat(['Anulado el', 'Motivo'])]].forEach(function (p) {
-    let x = ss.getSheetByName(p[0]);
+    let x = ss.getSheetByName(p[0]), datos = null;
     if (x && x.getLastRow() >= 1 && !cabeceraOk_(x, p[1])) {
-      if (x.getLastRow() > 1) { const nom = p[0] + ' (anterior)'; const y = ss.getSheetByName(nom); if (y) ss.deleteSheet(y); x.setName(nom); x = null; cambios.push(p[0] + ': los datos con el formato anterior quedaron en «' + nom + '».'); }
-      else x.clear();
+      if (x.getLastRow() > 1) {
+        const nom = p[0] + ' (respaldo v1)'; const y = ss.getSheetByName(nom); if (y) ss.deleteSheet(y);
+        x.copyTo(ss).setName(nom);
+        datos = migrarFilas_(x.getDataRange().getValues(), p[1]);
+        cambios.push(p[0] + ': ' + datos.length + ' fila(s) pasaron al formato nuevo (copia sin tocar en «' + nom + '»).');
+      }
+      x.clear();
     }
     if (!x) x = ss.insertSheet(p[0]);
     if (x.getLastRow() < 1) {
       cabecera_(x, p[1]);
+      if (p[0] === H.REG) x.getRange(2, COL_REV, x.getMaxRows() - 1, 1).setNumberFormat('@');
+      if (p[0] === H.DET) x.getRange(2, 2, x.getMaxRows() - 1, 1).setNumberFormat('@');
+      if (datos && datos.length) x.getRange(2, 1, datos.length, p[1].length).setValues(datos);
       if (p[0] === H.REG) {
-        x.getRange(2, COL_REV, x.getMaxRows() - 1, 1).setNumberFormat('@');
         [140, 110, 190, 90, 80, 110, 170, 40, 240, 80, 90, 80, 330, 260, 110, 80].forEach(function (w, i) { x.setColumnWidth(i + 1, w); });
       }
     }
@@ -288,6 +294,18 @@ function configuracionInicial() {
   bitacora_('Configuración inicial', VERSION + (cambios.length ? ' · ' + cambios.join(' ') : ''));
   try { onOpen(); } catch (e) {}
   avisar_('Listo', (cambios.length ? cambios.join('\n') + '\n\n' : '') + 'La rúbrica está en RUBRICA (una sola tabla para todos los hitos): lo que cambies ahí aparece en la app al abrirla.');
+}
+// Filas con el encabezado de la v1 → filas con el encabezado nuevo (las columnas se buscan por nombre)
+function migrarFilas_(v, cab) {
+  const viejo = v[0].map(function (x) { return String(x).trim(); }), alias = {'Nota final (sobre 100)': 'Nota final'};
+  const ix = cab.map(function (c) { let i = viejo.indexOf(c); if (i < 0 && alias[c]) i = viejo.indexOf(alias[c]); return i; });
+  const iNota = viejo.indexOf('Nota final');
+  return v.slice(1).filter(function (f) { return f.some(function (x) { return x !== '' && x !== null; }); }).map(function (f) {
+    return cab.map(function (c, j) {
+      if (c === 'Nota sobre 10' && ix[j] < 0) { const n = Number(f[iNota]); return iNota >= 0 && f[iNota] !== '' && !isNaN(n) ? Math.round(n / 10 + 1e-9) : ''; }
+      return ix[j] >= 0 ? f[ix[j]] : '';
+    });
+  });
 }
 function cabeceraOk_(sh, cab) {
   if (sh.getLastColumn() < cab.length) return false;
@@ -372,10 +390,10 @@ function anularRegistro() {
 function borrarPruebas() {
   const lock = LockService.getScriptLock(); lock.waitLock(20000); let n = 0;
   try {
-    [H.REG, H.REG + ' (anterior)'].forEach(function (nom) {
+    [H.REG, H.REG + ' (anterior)', H.REG + ' (respaldo v1)'].forEach(function (nom) {
       const reg = hoja_(nom), ids = {}; if (!reg) return;
       if (reg.getLastRow() >= 2) reg.getRange(2, 1, reg.getLastRow() - 1, 3).getValues().forEach(function (r) { if (/^prueba/i.test(String(r[2]).trim())) ids[r[1]] = 1; });
-      Object.keys(ids).forEach(function (id) { const f = filasDeId_(reg, 2, id); n += f.length; borrarFilas_(reg, f); [H.DET, H.DET + ' (anterior)'].forEach(function (d) { const det = hoja_(d); if (det) borrarFilas_(det, filasDeId_(det, 1, id)); }); });
+      Object.keys(ids).forEach(function (id) { const f = filasDeId_(reg, 2, id); n += f.length; borrarFilas_(reg, f); [H.DET, H.DET + ' (anterior)', H.DET + ' (respaldo v1)'].forEach(function (d) { const det = hoja_(d); if (det) borrarFilas_(det, filasDeId_(det, 1, id)); }); });
     });
     bitacora_('Borrar registros de prueba', n + ' fila(s)');
   } finally { lock.releaseLock(); }

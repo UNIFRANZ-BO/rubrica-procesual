@@ -21,7 +21,9 @@ function libro() {
       },
       getDataRange() { return sh.getRange(1, 1, Math.max(1, d.length), Math.max(1, sh.getLastColumn())); },
       appendRow(f) { d.length = sh.getLastRow(); d.push(f); }, deleteRows(r, n) { d.splice(r - 1, n); }, deleteRow(r) { d.splice(r - 1, 1); },
-      clear() { d.length = 0; }, setName(n) { delete hojas[sh.nombre]; sh.nombre = n; hojas[n] = sh; }
+      clear() { d.length = 0; }, setName(n) { delete hojas[sh.nombre]; sh.nombre = n; hojas[n] = sh; },
+      copyTo() { const c = hoja('copia de ' + sh.nombre); c.d.push(...d.map(r => r.slice())); return c; },
+      setFrozenColumns() { if (d[0] && d.length) throw new Error('No se pueden inmovilizar columnas que solo contengan parte de una celda combinada.'); }
     };
     return noop(sh);
   }
@@ -48,11 +50,22 @@ const vieja = (n, filas) => { const x = S.hoja(n); x.d.push(...filas); H[n] = x;
 vieja('CONFIG', [['Parámetro', 'Valor', 'Ayuda'], ['Registro abierto', 'SÍ'], ['Título de la rúbrica', 'Rúbrica de evaluación procesual'], ['Hitos habilitados', ''],
   ['Máximo de estudiantes por grupo', 7], ['Clave para docentes', ''], ['Mensaje cuando está cerrado', 'cerrado'], ['Semestres', '1; 2; 3'], ['Paralelos', '']]);
 vieja('RUBRICA', [['Hito', 'Dimensión', 'Peso (%)', 'Se califica', 'Criterio', 'Descripción (opcional)', 'Puntaje máximo', 'Cumple'], ['Hito 2', 'Conceptual', 30, 'Por grupo', 'X', '', 10, 10]]);
-vieja('REGISTROS', [['Fecha y hora', 'ID registro', 'Docente', 'Semestre', 'Paralelo'], [new Date(), 'RP-AAAAAAAA', 'PRUEBA Claude', '2', 'P000']]);
-vieja('DETALLE', [['ID registro', 'Revisión'], ['RP-AAAAAAAA', '1']]);
+const CAB1 = ['Fecha y hora', 'ID registro', 'Docente', 'Semestre', 'Paralelo', 'Hito', 'Grupo / proyecto', 'N.º', 'Estudiante', 'Nota final', 'Detalle por dimensión', 'Observaciones', 'Revisión', 'Versión app'];
+vieja('REGISTROS', [CAB1, ['20/11/2026', 'RP-S1W8E5ML', 'JOSE DAVID QUINONES COCA', '2', '102', 'Hito 4', 'Kinder', 1, 'Adrian medrano', 33, 'Conceptual 15/30', '', '1795201573764', '2.3'],
+  ['20/11/2026', 'RP-S1W8E5ML', 'JOSE DAVID QUINONES COCA', '2', '102', 'Hito 4', 'Kinder', 2, 'Fidel aduvuri', 75, 'x', '', '1795201573764', '2.3'], [new Date(), 'RP-AAAAAAAA', 'PRUEBA Claude', '2', 'P000', 'Hito 5', 'G', 1, 'Ana', 90, '', '', '1', '2.3']]);
+vieja('DETALLE', [['ID registro', 'Revisión', 'Hito', 'Docente', 'Semestre', 'Paralelo', 'Grupo / proyecto', 'Estudiante', 'Dimensión', 'Peso (%)', 'Se califica', 'Criterio', 'Nivel', 'Puntos', 'Puntaje máximo'],
+  ['RP-S1W8E5ML', '1795201573764', 'Hito 4', 'JOSE', '2', '102', 'Kinder', 'Adrian medrano', 'Conceptual', 30, 'Por grupo', 'Conocimiento', 'Cumple', 10, 10]]);
 vieja('PAPELERA', [['Fecha y hora', 'ID registro']]);
 S.configuracionInicial();
-assert.ok(H['RUBRICA (anterior)'] && H['REGISTROS (anterior)'] && H['DETALLE (anterior)'], 'lo viejo se guarda aparte');
+assert.ok(H['RUBRICA (anterior)'] && H['REGISTROS (respaldo v1)'] && H['DETALLE (respaldo v1)'], 'respaldo de lo viejo');
+assert.strictEqual(H['REGISTROS (respaldo v1)'].d.length, 4, 'el respaldo queda intacto');
+{ const C = n => S.CAB_REG.indexOf(n), f = H.REGISTROS.d;
+  assert.strictEqual(f.length, 4, 'los registros se migran en su lugar');
+  assert.deepStrictEqual([f[1][C('ID registro')], f[1][C('Docente')], f[1][C('Hito')], f[1][C('Semestre')], f[1][C('Carrera del grupo')], f[1][C('Estudiante')], f[1][C('Nota final (sobre 100)')], f[1][C('Nota sobre 10')], f[1][C('Revisión')]],
+    ['RP-S1W8E5ML', 'JOSE DAVID QUINONES COCA', 'Hito 4', '2', '', 'Adrian medrano', 33, 3, '1795201573764']);
+  assert.strictEqual(f[2][C('Nota sobre 10')], 8, '75 → 8');
+  assert.strictEqual(H.DETALLE.d[1][S.CAB_DET.indexOf('Criterio')], 'Conocimiento'); assert.strictEqual(H.DETALLE.d[1][S.CAB_DET.indexOf('Carrera')], ''); }
+assert.ok(S.get({action: 'verificar', id: 'RP-S1W8E5ML', rev: '1795201573764'}).existe, 'un registro migrado se puede verificar y corregir');
 assert.deepStrictEqual(H.REGISTROS.d[0], S.CAB_REG); assert.deepStrictEqual(H.DETALLE.d[0], S.CAB_DET);
 assert.strictEqual(H.PAPELERA.d[0][2], 'Docente', 'papelera vacía se rehace');
 const cfg = Object.fromEntries(H.CONFIG.d.slice(1).map(r => [r[0], r[1]]));
@@ -61,7 +74,7 @@ assert.strictEqual(cfg.Semestres, '1; 2; 3', 'respeta lo que ya había');
 
 /* ───── 2) la app recibe una sola rúbrica para cada hito ───── */
 let r = S.get({action: 'rubrica'});
-assert.ok(r.ok && r.version === 'RP 2.0', JSON.stringify(r).slice(0, 300));
+assert.ok(r.ok && r.version === 'RP 2.1', JSON.stringify(r).slice(0, 300));
 assert.deepStrictEqual(r.hitos.map(h => h.id), ['Hito 2', 'Hito 3', 'Hito 4', 'Hito 5']);
 assert.deepStrictEqual(r.carreras, ['ADM', 'ICO']); assert.deepStrictEqual(r.semestres, ['1', '2', '3']);
 let h = r.hitos[0];
@@ -103,18 +116,19 @@ const base = {id: 'RP-ABCDEFGH', rev: '1763650000000', version: '3.0', docente: 
   est: [{nombre: 'Juan Quispe', carrera: 'ADM', items: items(35)}, {nombre: 'Lucía Rojas', carrera: 'ICO', items: items(24)}, {nombre: 'Leo Paz', carrera: 'ICO', items: items(29)}]};
 r = S.post(base); assert.ok(r.ok, JSON.stringify(r));
 let reg = H.REGISTROS.d, C = n => S.CAB_REG.indexOf(n);
-assert.strictEqual(reg.length, 4);
+assert.strictEqual(reg.length, 7);
+reg = reg.filter(f => f[1] === 'RP-ABCDEFGH'); reg.unshift(S.CAB_REG);
 assert.deepStrictEqual([reg[1][C('Hito')], reg[1][C('Semestre')], reg[1][C('Carrera del grupo')], reg[1][C('Estudiante')], reg[1][C('Carrera')]], ['Hito 5', '2', 'ADM/ICO', 'Juan Quispe', 'ADM']);
 assert.deepStrictEqual(reg.slice(1).map(f => [f[C('Nota final (sobre 100)')], f[C('Nota sobre 10')]]), [[83, 8], [72, 7], [77, 8]], 'sobre 10 redondeado');
 assert.strictEqual(reg[1][C('Grupo / proyecto')], "'=Grupo 1", 'texto con = protegido');
 assert.strictEqual(reg[1][C('Detalle por dimensión')], 'Conceptual 18/30 · Procedimental 30/30 · Actitudinal 35/40');
-assert.strictEqual(H.DETALLE.d.length, 1 + 18); assert.strictEqual(H.DETALLE.d[1][8], 'ADM');
+assert.strictEqual(H.DETALLE.d.length, 1 + 1 + 18); assert.strictEqual(H.DETALLE.d[2][8], 'ADM');
 assert.ok(S.get({action: 'verificar', id: base.id, rev: base.rev}).existe);
 assert.ok(S.post(base).repetido, 'mismo envío dos veces no duplica');
 // corrección: reemplaza
 r = S.post(Object.assign({}, base, {rev: '1763650099999', est: [{nombre: 'Juan Quispe', carrera: 'ADM', items: items(40)}]}));
-assert.ok(r.ok); reg = H.REGISTROS.d;
-assert.strictEqual(reg.length, 2, 'corrección reemplaza'); assert.strictEqual(reg[1][C('Nota sobre 10')], 9);
+assert.ok(r.ok); reg = H.REGISTROS.d.filter(f => f[1] === 'RP-ABCDEFGH');
+assert.strictEqual(reg.length, 1, 'corrección reemplaza'); assert.strictEqual(reg[0][C('Nota sobre 10')], 9); assert.strictEqual(H.REGISTROS.d.length, 5);
 assert.ok(!S.get({action: 'verificar', id: base.id, rev: base.rev}).existe);
 // errores definitivos
 assert.strictEqual(S.post(Object.assign({}, base, {id: 'malo'})).codigo, 'datos');
@@ -127,10 +141,14 @@ H.CONFIG.d[1][1] = 'NO';
 assert.strictEqual(S.post(Object.assign({}, base, {id: 'RP-NUEVO124', clave: 'secreta'})).codigo, 'cerrada');
 assert.ok(/^cb1\(\{"ok":true/.test(S.doGet({parameter: {action: 'ping', callback: 'cb1'}}).t));
 S.borrarPruebas();
-assert.ok(!H.REGISTROS.d.some(f => /^PRUEBA/.test(f[2])) && !H['REGISTROS (anterior)'].d.some(f => /^PRUEBA/.test(f[2])), 'borrar pruebas (también en la hoja anterior)');
+assert.ok(!H.REGISTROS.d.some(f => /^PRUEBA/.test(f[2])) && !H['REGISTROS (respaldo v1)'].d.some(f => /^PRUEBA/.test(f[2])), 'borrar pruebas (también en el respaldo)');
+assert.ok(H.REGISTROS.d.some(f => f[1] === 'RP-S1W8E5ML'), 'los registros reales siguen');
 S.revisarRubrica(); S.verAvance();
 
-/* ───── 5) hoja nueva desde cero ───── */
+/* ───── 5) se vuelve a ejecutar sin problemas ───── */
+S.configuracionInicial(); assert.ok(H.REGISTROS.d.some(f => f[1] === 'RP-S1W8E5ML') && H.RUBRICA.d.length > 5, 'segunda ejecución no toca nada');
+
+/* ───── 6) hoja nueva desde cero ───── */
 S = libro(); S.configuracionInicial();
 r = S.get({action: 'rubrica'});
 assert.ok(r.hitos.length === 4 && r.hitos[0].total === 100 && !S.hojas['RUBRICA (anterior)']);
