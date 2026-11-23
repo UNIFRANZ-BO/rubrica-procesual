@@ -21,10 +21,11 @@ def check(codigo, nombre):
 rub = json.loads((raiz / 'rubrica.json').read_text(encoding='utf-8'))
 motor = (raiz / 'motor.js').read_text(encoding='utf-8')
 
-# Rúbrica de prueba = la inicial, leída con el mismo motor que usa el script
-demo = subprocess.run([node, '-e', motor + '\nconst r=' + js(rub) + ';const p=MOTOR.parsear(r.niveles,r.filas,[]);'
-                       'if(p.avisos.length){console.error(p.avisos.join("\\n"));process.exit(1)}'
-                       'console.log(JSON.stringify({ok:true,titulo:"Rúbrica de evaluación procesual",abierta:true,maxEst:7,clave:false,niveles:r.niveles,hitos:p.hitos}))'],
+# Rúbrica de prueba = la inicial, leída con el mismo motor que usa el script (una sola rúbrica para todos los hitos)
+demo = subprocess.run([node, '-e', motor + '\nconst r=' + js(rub) + ';const p=MOTOR.parsear(r.niveles,MOTOR.aFilas(r),[]);'
+                       'if(p.avisos.length){console.error(p.avisos.join(" | "));process.exit(1)}const h=p.hitos[0];'
+                       'console.log(JSON.stringify({ok:true,titulo:r.titulo,abierta:true,maxEst:7,clave:false,semestres:["1","2","3","4","5","6","7","8","9","10"],'
+                       'carreras:r.carreras,niveles:r.niveles,hitos:r.hitos.map(id=>({id,dims:h.dims,total:h.total}))}))'],
                       capture_output=True, text=True, encoding='utf-8')
 if demo.returncode: print('rubrica.json:', demo.stderr); sys.exit(1)
 rub_demo = demo.stdout.strip()
@@ -39,7 +40,7 @@ check(re.search(r'<script>(.*)</script>', s, re.S).group(1), 'index')
 print(f'index.html generado ({len(s) // 1024} KB) · sintaxis JS OK')
 
 g = (raiz / 'apps-script' / 'Code.src.gs').read_text(encoding='utf-8')
-for a, b in [('/*__MOTOR__*/', motor), ('/*__SEED__*/', 'const SEED = ' + js({'niveles': rub['niveles'], 'filas': rub['filas']}) + ';')]:
+for a, b in [('/*__MOTOR__*/', motor), ('/*__SEED__*/', 'const SEED = ' + js({k: v for k, v in rub.items() if not k.startswith('_')}) + ';')]:
     assert a in g, a
     g = g.replace(a, b)
 g = g.replace('ESTE ARCHIVO SE GENERA con build.py a partir de Code.src.gs', 'Generado con build.py a partir de Code.src.gs')

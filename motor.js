@@ -21,11 +21,47 @@ var MOTOR = (function () {
   }
   function modo(v) { return /estud|indiv|cada/.test(sinT(v)) ? 'estudiante' : 'grupo'; }
   function txt(v) { return String(v === null || v === undefined ? '' : v).replace(/\s+/g, ' ').trim(); }
-  // niveles: nombres de las columnas de nivel · filas: filas de la pestaña RUBRICA (sin encabezado) · habil: hitos habilitados
-  function parsear(niveles, filas, habil) {
+  function letra(n) { var s = ''; while (n > 0) { var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = (n - 1 - m) / 26 | 0; } return s; }
+  // Pestaña RUBRICA en formato visual: columna A = etiquetas (Dimensión, Peso (%), Se califica, Criterio, Descripción,
+  // Puntaje máximo y, debajo, un renglón por nivel); desde la columna B, una columna por criterio. La dimensión, el peso y
+  // «se califica» se escriben en la primera columna de su bloque (pueden estar combinadas). Devuelve {niveles, filas, donde}.
+  function desdeTabla(g) {
+    var et = {}, niveles = [], filasNv = [], filas = [], cols = [];
+    g.forEach(function (row, i) {
+      var k = sinT(row[0]); if (!k) return;
+      if (k.indexOf('dimension') === 0) et.dim = i;
+      else if (k.indexOf('peso') === 0) et.peso = i;
+      else if (k.indexOf('califica') >= 0) et.modo = i;
+      else if (k.indexOf('descrip') === 0) et.desc = i;
+      else if (k.indexOf('puntaje') === 0 || k.indexOf('maximo') >= 0) et.max = i;
+      else if (k.indexOf('criterio') === 0 && et.crit === undefined) et.crit = i;
+    });
+    if (et.crit === undefined) return {niveles: [], filas: [], donde: function () { return ''; }};
+    var ult = Math.max.apply(null, [et.dim, et.peso, et.modo, et.desc, et.max, et.crit].filter(function (x) { return x !== undefined; }));
+    g.forEach(function (row, i) { var t = txt(row[0]); if (i > ult && t && !/^(nota|instruc|como|ayuda|ℹ)/i.test(sinT(t))) { niveles.push(t); filasNv.push(i); } });
+    var c0 = function (i, c) { return i === undefined || !g[i] || g[i][c] === undefined || g[i][c] === null ? '' : g[i][c]; };
+    var ncol = g.reduce(function (m, r) { return Math.max(m, r.length); }, 0), dim = '', peso = '', md = '';
+    for (var c = 1; c < ncol; c++) {
+      var dn = txt(c0(et.dim, c));
+      if (dn) { dim = dn; peso = c0(et.peso, c); md = c0(et.modo, c); }
+      else { var p = c0(et.peso, c); if (txt(p)) peso = p; var m = c0(et.modo, c); if (txt(m)) md = m; }
+      var cn = txt(c0(et.crit, c)); if (!cn) continue;
+      filas.push(['Rúbrica', dim, peso, md, cn, c0(et.desc, c), c0(et.max, c)].concat(filasNv.map(function (i) { return c0(i, c); })));
+      cols.push(c);
+    }
+    return {niveles: niveles, filas: filas, donde: function (i) { return 'Columna ' + letra(cols[i] + 1); }};
+  }
+  // Rúbrica de rubrica.json (dims con nv crudos) → filas para parsear
+  function aFilas(r) {
+    var f = [];
+    r.dims.forEach(function (d) { d.crit.forEach(function (c) { f.push(['Rúbrica', d.nombre, d.peso, d.modo, c.nombre, c.desc || '', c.max].concat(c.nv)); }); });
+    return f;
+  }
+  // niveles: nombres de los niveles · filas: [hito, dimensión, peso, se califica, criterio, descripción, máximo, nivel1, nivel2…]
+  function parsear(niveles, filas, habil, donde) {
     var hitos = [], avisos = [], porId = {}, hab = (habil || []).map(sinT).filter(Boolean);
     filas.forEach(function (f, i) {
-      var fila = i + 2, hito = txt(f[0]), crit = txt(f[4]);
+      var fila = donde ? donde(i) : 'Fila ' + (i + 2), hito = txt(f[0]), crit = txt(f[4]);
       if (!hito || !crit) return;
       if (hab.length && hab.indexOf(sinT(hito)) < 0) return;
       var h = porId[sinT(hito)];
@@ -38,13 +74,13 @@ var MOTOR = (function () {
       niveles.forEach(function (n, j) {
         var raw = f[7 + j]; if (raw === '' || raw === null || raw === undefined || !txt(n)) return;
         var r = rango(raw);
-        if (!r) { avisos.push('Fila ' + fila + ': no entiendo el puntaje «' + raw + '» del nivel «' + n + '». Usa un número (10) o un rango (0-3).'); return; }
+        if (!r) { avisos.push(fila + ': no entiendo el puntaje «' + raw + '» del nivel «' + n + '». Usa un número (10) o un rango (0-3).'); return; }
         nv.push({n: txt(n), a: r[0], b: r[1]});
       });
       var mxn = nv.reduce(function (m, x) { return Math.max(m, x.b); }, 0), mx = num(f[6]);
       if (isNaN(mx)) mx = mxn;
-      if (!(mx > 0)) { avisos.push('Fila ' + fila + ': falta el puntaje máximo de «' + crit + '» (no se muestra).'); return; }
-      if (mxn > mx) { avisos.push('Fila ' + fila + ': un nivel de «' + crit + '» da más puntos (' + mxn + ') que el máximo (' + mx + '); se usa ' + mxn + '.'); mx = mxn; }
+      if (!(mx > 0)) { avisos.push(fila + ': falta el puntaje máximo de «' + crit + '» (no se muestra).'); return; }
+      if (mxn > mx) { avisos.push(fila + ': un nivel de «' + crit + '» da más puntos (' + mxn + ') que el máximo (' + mx + '); se usa ' + mxn + '.'); mx = mxn; }
       d.crit.push({nombre: crit, desc: txt(f[5]), max: mx, nv: nv});
     });
     hitos.forEach(function (h) {
@@ -69,5 +105,5 @@ var MOTOR = (function () {
     return {dims: dims, total: tot, completo: completo};
   }
   function red(x, d) { var f = Math.pow(10, d === undefined ? 1 : d); return Math.round((x + 1e-9) * f) / f; }
-  return {sinT: sinT, num: num, rango: rango, modo: modo, parsear: parsear, nota: nota, red: red};
+  return {sinT: sinT, num: num, rango: rango, modo: modo, letra: letra, desdeTabla: desdeTabla, aFilas: aFilas, parsear: parsear, nota: nota, red: red};
 })();
